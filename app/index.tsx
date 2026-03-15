@@ -17,8 +17,8 @@ import {
   ZapIcon,
 } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
-import * as React from 'react';
-import { ScrollView, View } from 'react-native';
+import { Alert, ScrollView, View } from 'react-native';
+import { importAnkiDeck } from '@/lib/data/ankiImport';
 
 // ─── Theme Toggle ────────────────────────────────────────────────
 const THEME_ICONS = { light: SunIcon, dark: MoonStarIcon };
@@ -63,15 +63,18 @@ function FeatureCard({
   title,
   description,
   accentColor,
+  onPress,
 }: {
   icon: any;
   title: string;
   description: string;
   accentColor: string;
+  onPress?: () => void;
 }) {
   return (
     <Button
       variant="ghost"
+      onPress={onPress}
       className="h-auto w-full flex-row items-center justify-start gap-4 rounded-xl px-4 py-3.5">
       <View className={`rounded-xl p-2.5 ${accentColor}`}>
         <Icon as={icon} className="size-5 text-white" />
@@ -161,9 +164,23 @@ export default function HomeScreen() {
               <Separator className="mx-4" />
               <FeatureCard
                 icon={BookOpenIcon}
-                title="Browse Decks"
-                description="Explore your 12 decks"
+                title="Import Anki Deck"
+                description="Import .apkg flashcards"
                 accentColor="bg-emerald-500"
+                onPress={async () => {
+                  try {
+                    const res = await importAnkiDeck();
+                    if (res?.success) {
+                      Alert.alert('Success', `Imported ${res.count} cards`);
+                    } else {
+                      if (res?.message !== 'Import cancelled') {
+                        Alert.alert('Error', res?.message || 'Failed to import');
+                      }
+                    }
+                  } catch (e: any) {
+                    Alert.alert('Error', e.message);
+                  }
+                }}
               />
             </CardContent>
           </Card>

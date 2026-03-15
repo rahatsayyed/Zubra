@@ -6,6 +6,8 @@ import { PortalHost } from '@rn-primitives/portal';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
+import { useEffect } from 'react';
+import { initDatabase } from '@/lib/data/database';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -14,6 +16,18 @@ export {
 
 export default function RootLayout() {
   const { colorScheme } = useColorScheme();
+
+  useEffect(() => {
+    const setupDatabase = async () => {
+      try {
+        await initDatabase();
+        console.log("Database setup complete");
+      } catch (error) {
+        console.error("Failed to initialize database:", error);
+      }
+    };
+    setupDatabase();
+  }, []);
 
   return (
     <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
