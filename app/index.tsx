@@ -19,14 +19,16 @@ import {
 import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import { Alert, ScrollView, View } from 'react-native';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter, Link } from 'expo-router';
 import { importAnkiDeck } from '@/lib/data/ankiImport';
 import { 
   getDecks, 
   Deck, 
   getTotalCardsCount, 
   getMasteredCardsCount, 
-  getDeckDueCount 
+  getDeckDueCount,
+  getDeckMastery,
+  getUserStreak
 } from '@/lib/data/api';
 
 // ─── Theme Toggle ────────────────────────────────────────────────
@@ -103,10 +105,13 @@ const SCREEN_OPTIONS = {
 };
 
 export default function HomeScreen() {
+  const router = useRouter();
   const [decks, setDecks] = React.useState<Deck[]>([]);
   const [totalCards, setTotalCards] = React.useState(0);
   const [masteredCards, setMasteredCards] = React.useState(0);
   const [dueToday, setDueToday] = React.useState(0);
+  const [streak, setStreak] = React.useState(0);
+  const [deckMasteries, setDeckMasteries] = React.useState<Record<string, number>>({});
 
   const loadData = async () => {
     try {
@@ -116,10 +121,18 @@ export default function HomeScreen() {
       const tc = await getTotalCardsCount();
       const mc = await getMasteredCardsCount();
       const dt = await getDeckDueCount(); // no deckId = all decks
+      const currentStreak = await getUserStreak();
+      
+      const masteries: Record<string, number> = {};
+      for (const d of allDecks) {
+        masteries[d.id] = await getDeckMastery(d.id);
+      }
       
       setTotalCards(tc);
       setMasteredCards(mc);
       setDueToday(dt);
+      setStreak(currentStreak);
+      setDeckMasteries(masteries);
     } catch (e) {
       console.error(e);
     }
@@ -154,12 +167,12 @@ export default function HomeScreen() {
                     <Icon as={FlameIcon} className="size-6 text-orange-500" />
                   </View>
                   <View>
-                    <Text className="text-lg font-bold text-foreground">7 Day Streak!</Text>
-                    <Text className="text-sm text-muted-foreground">Keep it going 🔥</Text>
+                    <Text className="text-lg font-bold text-foreground">{streak} Day Streak!</Text>
+                    <Text className="text-sm text-muted-foreground">{streak > 0 ? "Keep it going 🔥" : "Start your streak today!"}</Text>
                   </View>
                 </View>
                 <View className="items-center rounded-full bg-orange-500 px-3.5 py-1.5">
-                  <Text className="text-sm font-bold text-white">7</Text>
+                  <Text className="text-sm font-bold text-white">{streak}</Text>
                 </View>
               </View>
               <View className="gap-1.5">
@@ -197,7 +210,7 @@ export default function HomeScreen() {
                 title="Create Deck"
                 description="Build a new flashcard deck"
                 accentColor="bg-blue-500"
-                onPress={() => Alert.alert('Coming Soon')}
+                onPress={() => router.push('/deck/create')}
               />
               <Separator className="mx-4" />
               <FeatureCard
@@ -236,30 +249,33 @@ export default function HomeScreen() {
               <Text className="text-sm text-muted-foreground ml-2 mt-2">No decks yet. Import one to get started!</Text>
             )}
             {decks.map((deck) => {
-              // Quick mockup of progress - dynamic calculate could be complex
-              const progress = deck.cards > 0 ? Math.round((Math.random() * deck.cards) / deck.cards * 100) : 0;
+              const progress = deckMasteries[deck.id] || 0;
               return (
-              <Card key={deck.id} className="w-44">
-                <CardHeader className="gap-2 p-4 pb-2">
-                  <View className="self-start rounded-lg p-2 bg-blue-500">
-                    <Icon as={LayersIcon} className="size-4 text-white" />
-                  </View>
-                  <CardTitle>
-                    <Text className="text-sm font-semibold text-card-foreground" numberOfLines={1}>{deck.title}</Text>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="px-4 pb-4 pt-0">
-                  <CardDescription>
-                    <Text className="text-xs text-muted-foreground">{deck.cards} cards</Text>
-                  </CardDescription>
-                  <View className="mt-2.5 gap-1">
-                    <Progress value={progress} className="h-1.5" />
-                    <Text className="text-[10px] text-muted-foreground">
-                      {progress}% mastered
-                    </Text>
-                  </View>
-                </CardContent>
-              </Card>
+              <Link href={`/deck/${deck.id}/edit`} asChild key={deck.id}>
+                <Button variant="ghost" className="p-0 h-auto">
+                  <Card className="w-44 text-left">
+                    <CardHeader className="gap-2 p-4 pb-2 items-start">
+                      <View className="rounded-lg p-2 bg-blue-500">
+                        <Icon as={LayersIcon} className="size-4 text-white" />
+                      </View>
+                      <CardTitle>
+                        <Text className="text-sm font-semibold text-card-foreground" numberOfLines={1}>{deck.title}</Text>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="px-4 pb-4 pt-0 items-start">
+                      <CardDescription>
+                        <Text className="text-xs text-muted-foreground">{deck.cards} cards</Text>
+                      </CardDescription>
+                      <View className="mt-2.5 gap-1 w-full">
+                        <Progress value={progress} className="h-1.5" />
+                        <Text className="text-[10px] text-muted-foreground">
+                          {progress}% mastered
+                        </Text>
+                      </View>
+                    </CardContent>
+                  </Card>
+                </Button>
+              </Link>
             )})}
           </ScrollView>
         </View>

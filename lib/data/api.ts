@@ -383,3 +383,81 @@ export const updateCardAfterReview = async (
     ]
   );
 };
+
+export const updateDeck = async (id: string, deck: Partial<Deck>): Promise<void> => {
+  const { title, description } = deck;
+  const updates: string[] = [];
+  const params: any[] = [];
+  
+  if (title !== undefined) {
+    updates.push('title = ?');
+    params.push(title);
+  }
+  
+  if (description !== undefined) {
+    updates.push('description = ?');
+    params.push(description);
+  }
+  
+  if (updates.length > 0) {
+    params.push(id);
+    await executeSql(
+      `UPDATE decks SET ${updates.join(', ')} WHERE id = ?`,
+      params
+    );
+  }
+};
+
+export const getDeckMastery = async (deckId: string): Promise<number> => {
+  const allCardsRows = await querySql('SELECT COUNT(*) as count FROM cards WHERE deck_id = ?', [deckId]);
+  const masteredCardsRows = await querySql('SELECT COUNT(*) as count FROM cards WHERE deck_id = ? AND stability > 30', [deckId]);
+  
+  const total = allCardsRows[0]?.count || 0;
+  if (total === 0) return 0;
+  
+  const mastered = masteredCardsRows[0]?.count || 0;
+  return Math.round((mastered / total) * 100);
+};
+
+export const getUserStreak = async (): Promise<number> => {
+  const rows = await querySql('SELECT review FROM card_review_logs');
+  
+  // Get unique local date strings (YYYY-MM-DD)
+  const dateStrs = Array.from(new Set(rows.map(row => {
+    const d = new Date(row.review);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }))).sort((a, b) => b.localeCompare(a));
+  
+  if (dateStrs.length === 0) return 0;
+
+  let streak = 0;
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+
+  // If the last review isn't today or yesterday, the streak is broken (0)
+  if (dateStrs[0] !== todayStr && dateStrs[0] !== yesterdayStr) {
+    return 0;
+  }
+  
+  let currentCheckStr = dateStrs[0];
+
+  let i = 0;
+  while (i < dateStrs.length) {
+    if (dateStrs[i] === currentCheckStr) {
+      streak++;
+      // Move currentCheckStr back 1 day
+      const d = new Date(currentCheckStr + 'T12:00:00Z');
+      d.setDate(d.getDate() - 1);
+      currentCheckStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      i++;
+    } else {
+      break;
+    }
+  }
+
+  return streak;
+};
