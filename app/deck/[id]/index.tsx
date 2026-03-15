@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, ScrollView, Modal, TouchableOpacity, Alert } from 'react-native';
+import { View, ScrollView, Modal, TouchableOpacity, Alert, TextInput } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -15,9 +15,10 @@ export default function DeckDetailScreen() {
   const [deck, setDeck] = useState<Deck | null>(null);
   const [mastery, setMastery] = useState(0);
   const [showCustomModal, setShowCustomModal] = useState(false);
-  
+
   // Custom Study State
   const [customLimit, setCustomLimit] = useState<number>(20);
+  const [customLimitText, setCustomLimitText] = useState<string>('');
   const [customBand, setCustomBand] = useState<DifficultyBand>('Any');
 
   useFocusEffect(
@@ -49,80 +50,69 @@ export default function DeckDetailScreen() {
 
   return (
     <>
-      <Stack.Screen 
-        options={{ 
+      <Stack.Screen
+        options={{
           title: deck.title,
           headerRight: () => (
-            <Button 
-               variant="ghost" 
-               size="icon" 
-               onPress={() => router.push(`/deck/${id}/edit`)}
-            >
-               <Icon as={Settings} className="size-5 text-foreground" />
+            <Button variant="ghost" size="icon" onPress={() => router.push(`/deck/${id}/edit`)}>
+              <Icon as={Settings} className="size-5 text-foreground" />
             </Button>
-          )
-        }} 
+          ),
+        }}
       />
       <ScrollView className="flex-1 bg-background p-4" contentContainerClassName="gap-6">
-        
         <View className="items-center py-6">
-           <Text className="text-3xl font-bold text-foreground text-center">{deck.title}</Text>
-           {deck.description ? (
-             <Text className="text-base text-muted-foreground text-center mt-2">{deck.description}</Text>
-           ) : null}
+          <Text className="text-center text-3xl font-bold text-foreground">{deck.title}</Text>
+          {deck.description ? (
+            <Text className="mt-2 text-center text-base text-muted-foreground">
+              {deck.description}
+            </Text>
+          ) : null}
         </View>
 
         <Card>
-          <CardContent className="p-4 gap-4">
-            <View className="flex-row justify-between items-end">
-               <View>
-                 <Text className="text-sm font-semibold text-foreground">Mastery</Text>
-                 <Text className="text-xs text-muted-foreground">{mastery}% mastered</Text>
-               </View>
-               <Text className="text-xs text-muted-foreground">{deck.cards} total cards</Text>
+          <CardContent className="gap-4 p-4">
+            <View className="flex-row items-end justify-between">
+              <View>
+                <Text className="text-sm font-semibold text-foreground">Mastery</Text>
+                <Text className="text-xs text-muted-foreground">{mastery}% mastered</Text>
+              </View>
+              <Text className="text-xs text-muted-foreground">{deck.cards} total cards</Text>
             </View>
             <Progress value={mastery} className="h-2" />
           </CardContent>
         </Card>
 
         <View className="gap-3">
-          <Button 
-            className="w-full flex-row gap-2 py-6 bg-primary" 
-            onPress={startScheduledSession}
-          >
-             <Icon as={Play} className="size-5 text-white" />
-             <Text className="text-lg text-white font-bold">Study Scheduled</Text>
+          <Button className="w-full flex-row gap-2 bg-primary" onPress={startScheduledSession}>
+            <Icon as={Play} className="size-5 text-primary-foreground" />
+            <Text className="font-semibold text-primary-foreground">Review Due Cards</Text>
           </Button>
-          
-          <Button 
+          <Button
             variant="outline"
-            className="w-full flex-row gap-2 py-6" 
-            onPress={() => setShowCustomModal(true)}
-          >
-             <Text className="text-lg font-bold">Custom Study</Text>
+            className="flex-1 flex-row gap-2"
+            onPress={() => setShowCustomModal(true)}>
+            <Text>Custom Study</Text>
           </Button>
 
-          <View className="flex-row gap-3 mt-4">
-             <Button 
-               variant="outline" 
-               className="flex-1 flex-row gap-2"
-               onPress={() => router.push(`/deck/${id}/cards`)}
-             >
-                <Icon as={List} className="size-5 text-foreground" />
-                <Text>Manage Cards</Text>
-             </Button>
+          <View className="mt-4 flex-row gap-3">
+            <Button
+              variant="outline"
+              className="flex-1 flex-row gap-2"
+              onPress={() => router.push(`/deck/${id}/cards`)}>
+              <Icon as={List} className="size-5 text-foreground" />
+              <Text>Manage Cards</Text>
+            </Button>
 
-             <Button 
-               variant="outline" 
-               className="flex-1 flex-row gap-2"
-               onPress={() => router.push(`/deck/${id}/cards/create`)}
-             >
-                <Icon as={Plus} className="size-5 text-foreground" />
-                <Text>Add Card</Text>
-             </Button>
+            <Button
+              variant="outline"
+              className="flex-1 flex-row gap-2"
+              onPress={() => router.push(`/deck/${id}/cards/create`)}>
+              <Icon as={Plus} className="size-5 text-foreground" />
+              <Text>Add Card</Text>
+            </Button>
           </View>
         </View>
-
       </ScrollView>
 
       {/* Custom Study Modal */}
@@ -130,45 +120,73 @@ export default function DeckDetailScreen() {
         visible={showCustomModal}
         transparent
         animationType="slide"
-        onRequestClose={() => setShowCustomModal(false)}
-      >
+        onRequestClose={() => setShowCustomModal(false)}>
         <View className="flex-1 justify-end bg-black/50">
-          <View className="bg-background rounded-t-3xl p-6 min-h-[50%]">
-            <View className="flex-row justify-between items-center mb-6">
+          <View className="min-h-[50%] rounded-t-3xl bg-background p-6">
+            <View className="mb-6 flex-row items-center justify-between">
               <Text className="text-2xl font-bold text-foreground">Custom Study</Text>
               <Button variant="ghost" size="icon" onPress={() => setShowCustomModal(false)}>
                 <Icon as={X} className="size-6 text-foreground" />
               </Button>
             </View>
 
-            <Text className="text-sm font-semibold text-muted-foreground mb-3">SELECT CARD DIFFICULTY</Text>
-            <View className="flex-row flex-wrap gap-2 mb-6">
+            <Text className="mb-3 text-sm font-semibold text-muted-foreground">
+              SELECT CARD DIFFICULTY
+            </Text>
+            <View className="mb-6 flex-row flex-wrap gap-2">
               {['Any', 'Again', 'Hard', 'Good', 'Easy'].map((band) => (
                 <TouchableOpacity
                   key={band}
                   onPress={() => setCustomBand(band as DifficultyBand)}
-                  className={`px-4 py-2 rounded-full border ${customBand === band ? 'bg-primary border-primary' : 'border-border'}`}
-                >
-                  <Text className={customBand === band ? 'text-primary-foreground font-bold' : 'text-foreground'}>{band}</Text>
+                  className={`rounded-full border px-4 py-2 ${customBand === band ? 'border-primary bg-primary' : 'border-border'}`}>
+                  <Text
+                    className={
+                      customBand === band ? 'font-bold text-primary-foreground' : 'text-foreground'
+                    }>
+                    {band}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
 
-            <Text className="text-sm font-semibold text-muted-foreground mb-3">MAXIMUM CARDS</Text>
-            <View className="flex-row flex-wrap gap-2 mb-8">
-               {[10, 20, 50, 100].map((limit) => (
-                 <TouchableOpacity
-                   key={limit}
-                   onPress={() => setCustomLimit(limit)}
-                   className={`px-4 py-2 rounded-full border ${customLimit === limit ? 'bg-primary border-primary' : 'border-border'}`}
-                 >
-                   <Text className={customLimit === limit ? 'text-primary-foreground font-bold' : 'text-foreground'}>{limit}</Text>
-                 </TouchableOpacity>
-               ))}
+            <Text className="mb-3 text-sm font-semibold text-muted-foreground">MAXIMUM CARDS</Text>
+            <View className="mb-8 flex-row flex-wrap items-center gap-2">
+              {[10, 20, 50, 100].map((limit) => (
+                <TouchableOpacity
+                  key={limit}
+                  onPress={() => {
+                    setCustomLimit(limit);
+                    setCustomLimitText('');
+                  }}
+                  className={`rounded-full border px-4 py-2 ${customLimit === limit && customLimitText === '' ? 'border-primary bg-primary' : 'border-border'}`}>
+                  <Text
+                    className={
+                      customLimit === limit && customLimitText === ''
+                        ? 'font-bold text-primary-foreground'
+                        : 'text-foreground'
+                    }>
+                    {limit}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+              <TextInput
+                className={`min-w-[80px] rounded-full border px-4 py-2 text-center ${customLimitText !== '' ? 'border-primary bg-primary font-bold text-primary-foreground' : 'border-border text-foreground'}`}
+                placeholder="Custom"
+                placeholderTextColor="#888"
+                keyboardType="number-pad"
+                value={customLimitText}
+                onChangeText={(text) => {
+                  setCustomLimitText(text);
+                  const parsed = parseInt(text, 10);
+                  if (!isNaN(parsed)) {
+                    setCustomLimit(parsed);
+                  }
+                }}
+              />
             </View>
 
-            <Button className="w-full py-6 mt-auto shadow-sm" onPress={startCustomSession}>
-               <Text className="text-lg font-bold">Start Session</Text>
+            <Button className="mt-auto w-full shadow-sm" onPress={startCustomSession}>
+              <Text className="font-semibold text-primary-foreground">Start Session</Text>
             </Button>
           </View>
         </View>
