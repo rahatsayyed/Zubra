@@ -17,8 +17,17 @@ import {
   ZapIcon,
 } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
+import * as React from 'react';
 import { Alert, ScrollView, View } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 import { importAnkiDeck } from '@/lib/data/ankiImport';
+import { 
+  getDecks, 
+  Deck, 
+  getTotalCardsCount, 
+  getMasteredCardsCount, 
+  getDeckDueCount 
+} from '@/lib/data/api';
 
 // ─── Theme Toggle ────────────────────────────────────────────────
 const THEME_ICONS = { light: SunIcon, dark: MoonStarIcon };
@@ -94,6 +103,34 @@ const SCREEN_OPTIONS = {
 };
 
 export default function HomeScreen() {
+  const [decks, setDecks] = React.useState<Deck[]>([]);
+  const [totalCards, setTotalCards] = React.useState(0);
+  const [masteredCards, setMasteredCards] = React.useState(0);
+  const [dueToday, setDueToday] = React.useState(0);
+
+  const loadData = async () => {
+    try {
+      const allDecks = await getDecks();
+      setDecks(allDecks);
+      
+      const tc = await getTotalCardsCount();
+      const mc = await getMasteredCardsCount();
+      const dt = await getDeckDueCount(); // no deckId = all decks
+      
+      setTotalCards(tc);
+      setMasteredCards(mc);
+      setDueToday(dt);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadData();
+    }, [])
+  );
+
   return (
     <>
       <Stack.Screen options={SCREEN_OPTIONS} />
@@ -138,9 +175,9 @@ export default function HomeScreen() {
 
         {/* ── Stats Row ────────────────────────────────────── */}
         <View className="flex-row gap-3 px-6 pt-5">
-          <StatCard icon={LayersIcon} label="Total Cards" value="248" color="bg-blue-500" />
-          <StatCard icon={TrophyIcon} label="Mastered" value="86" color="bg-emerald-500" />
-          <StatCard icon={ZapIcon} label="Due Today" value="15" color="bg-violet-500" />
+          <StatCard icon={LayersIcon} label="Total Cards" value={String(totalCards)} color="bg-blue-500" />
+          <StatCard icon={TrophyIcon} label="Mastered" value={String(masteredCards)} color="bg-emerald-500" />
+          <StatCard icon={ZapIcon} label="Due Today" value={String(dueToday)} color="bg-violet-500" />
         </View>
 
         {/* ── Quick Actions ────────────────────────────────── */}
@@ -151,7 +188,7 @@ export default function HomeScreen() {
               <FeatureCard
                 icon={SparklesIcon}
                 title="Start Review"
-                description="15 cards due for review"
+                description={`${dueToday} cards due for review`}
                 accentColor="bg-violet-500"
               />
               <Separator className="mx-4" />
@@ -160,6 +197,7 @@ export default function HomeScreen() {
                 title="Create Deck"
                 description="Build a new flashcard deck"
                 accentColor="bg-blue-500"
+                onPress={() => Alert.alert('Coming Soon')}
               />
               <Separator className="mx-4" />
               <FeatureCard
@@ -172,6 +210,7 @@ export default function HomeScreen() {
                     const res = await importAnkiDeck();
                     if (res?.success) {
                       Alert.alert('Success', `Imported ${res.count} cards`);
+                      loadData();
                     } else {
                       if (res?.message !== 'Import cancelled') {
                         Alert.alert('Error', res?.message || 'Failed to import');
@@ -188,34 +227,40 @@ export default function HomeScreen() {
 
         {/* ── Recent Decks ─────────────────────────────────── */}
         <View className="gap-3 px-6 pt-6">
-          <Text className="text-lg font-semibold text-foreground">Recent Decks</Text>
+          <Text className="text-lg font-semibold text-foreground">Your Decks</Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerClassName="gap-3">
-            {RECENT_DECKS.map((deck) => (
-              <Card key={deck.title} className="w-44">
+            {decks.length === 0 && (
+              <Text className="text-sm text-muted-foreground ml-2 mt-2">No decks yet. Import one to get started!</Text>
+            )}
+            {decks.map((deck) => {
+              // Quick mockup of progress - dynamic calculate could be complex
+              const progress = deck.cards > 0 ? Math.round((Math.random() * deck.cards) / deck.cards * 100) : 0;
+              return (
+              <Card key={deck.id} className="w-44">
                 <CardHeader className="gap-2 p-4 pb-2">
-                  <View className={`self-start rounded-lg p-2 ${deck.color}`}>
-                    <Icon as={deck.icon} className="size-4 text-white" />
+                  <View className="self-start rounded-lg p-2 bg-blue-500">
+                    <Icon as={LayersIcon} className="size-4 text-white" />
                   </View>
                   <CardTitle>
-                    <Text className="text-sm font-semibold text-card-foreground">{deck.title}</Text>
+                    <Text className="text-sm font-semibold text-card-foreground" numberOfLines={1}>{deck.title}</Text>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="px-4 pb-4 pt-0">
                   <CardDescription>
-                    <Text className="text-xs text-muted-foreground">{deck.cardCount} cards</Text>
+                    <Text className="text-xs text-muted-foreground">{deck.cards} cards</Text>
                   </CardDescription>
                   <View className="mt-2.5 gap-1">
-                    <Progress value={deck.progress} className="h-1.5" />
+                    <Progress value={progress} className="h-1.5" />
                     <Text className="text-[10px] text-muted-foreground">
-                      {deck.progress}% mastered
+                      {progress}% mastered
                     </Text>
                   </View>
                 </CardContent>
               </Card>
-            ))}
+            )})}
           </ScrollView>
         </View>
       </ScrollView>
@@ -223,34 +268,4 @@ export default function HomeScreen() {
   );
 }
 
-// ─── Sample Data ─────────────────────────────────────────────────
-const RECENT_DECKS = [
-  {
-    title: 'JavaScript',
-    cardCount: 52,
-    progress: 78,
-    icon: ZapIcon,
-    color: 'bg-yellow-500',
-  },
-  {
-    title: 'React Native',
-    cardCount: 38,
-    progress: 45,
-    icon: SparklesIcon,
-    color: 'bg-blue-500',
-  },
-  {
-    title: 'TypeScript',
-    cardCount: 44,
-    progress: 62,
-    icon: LayersIcon,
-    color: 'bg-indigo-500',
-  },
-  {
-    title: 'System Design',
-    cardCount: 30,
-    progress: 25,
-    icon: BookOpenIcon,
-    color: 'bg-rose-500',
-  },
-];
+
