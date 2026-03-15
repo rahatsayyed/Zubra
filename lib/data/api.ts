@@ -461,3 +461,58 @@ export const getUserStreak = async (): Promise<number> => {
 
   return streak;
 };
+
+export const getCard = async (id: string): Promise<Card> => {
+  const rows = await querySql('SELECT * FROM cards WHERE id = ?', [id]);
+
+  if (rows.length === 0) {
+    throw new Error('Card not found');
+  }
+
+  const row = rows[0];
+  return {
+    id: row.id,
+    question: row.question || '',
+    answer: row.answer || '',
+    deck: row.deck_id,
+  };
+};
+
+export const updateCard = async (id: string, card: Partial<Card>): Promise<void> => {
+  const { question, answer } = card;
+  const updates: string[] = [];
+  const params: any[] = [];
+  
+  if (question !== undefined) {
+    updates.push('question = ?');
+    params.push(question);
+  }
+  
+  if (answer !== undefined) {
+    updates.push('answer = ?');
+    params.push(answer);
+  }
+  
+  if (updates.length > 0) {
+    params.push(id);
+    await executeSql(
+      `UPDATE cards SET ${updates.join(', ')} WHERE id = ?`,
+      params
+    );
+  }
+};
+
+export const deleteCard = async (cardId: string): Promise<void> => {
+  const rows = await querySql('SELECT deck_id FROM cards WHERE id = ?', [cardId]);
+  if (rows.length > 0) {
+    const deckId = rows[0].deck_id;
+    await executeSql('DELETE FROM card_review_logs WHERE card_id = ?', [cardId]);
+    await executeSql('DELETE FROM cards WHERE id = ?', [cardId]);
+    
+    // Decrement deck counter
+    await executeSql(
+      'UPDATE decks SET cards = cards - 1 WHERE id = ?',
+      [deckId]
+    );
+  }
+};

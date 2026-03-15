@@ -251,7 +251,7 @@ export default function HomeScreen() {
             {decks.map((deck) => {
               const progress = deckMasteries[deck.id] || 0;
               return (
-              <Link href={`/deck/${deck.id}/edit`} asChild key={deck.id}>
+              <Link href={`/deck/${deck.id}`} asChild key={deck.id}>
                 <Button variant="ghost" className="p-0 h-auto">
                   <Card className="w-44 text-left">
                     <CardHeader className="gap-2 p-4 pb-2 items-start">
