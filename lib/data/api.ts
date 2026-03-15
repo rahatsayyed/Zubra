@@ -516,3 +516,20 @@ export const deleteCard = async (cardId: string): Promise<void> => {
     );
   }
 };
+
+export const getDueCards = async (deckId: string): Promise<Card[]> => {
+  const now = new Date().toISOString();
+  // Fetch cards where Due Date is passed, OR due is null (brand new imported cards)
+  const rows = await querySql(
+    'SELECT * FROM cards WHERE deck_id = ? AND (due <= ? OR due IS NULL) ORDER BY due ASC',
+    [deckId, now]
+  );
+  
+  return rows.map((row: any) => ({
+    id: row.id,
+    question: row.question || '',
+    answer: row.answer || '',
+    deck: row.deck_id,
+  }));
+};
+
