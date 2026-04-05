@@ -7,12 +7,17 @@ import {
   ArrowUpRightIcon,
   ChevronDownIcon,
   DownloadIcon,
+  HomeIcon,
   PlusIcon,
   SearchIcon,
+  SettingsIcon,
+  SparklesIcon,
   XIcon,
+  LayersPlusIcon,
 } from 'lucide-react-native';
 import * as React from 'react';
-import { Alert, Pressable, ScrollView, TextInput, View } from 'react-native';
+import { Alert, Animated, Modal, Pressable, ScrollView, TextInput, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 
 // ─── Deck card colour classes (full strings so NativeWind can detect them) ────
@@ -92,14 +97,14 @@ function DeckCard({
     <Pressable
       onPress={onPress}
       className={cn(
-        'rounded-2xl px-5 pt-5 pb-7 min-h-[130px] justify-between active:opacity-80',
-        colorClass,
+        'min-h-[130px] justify-between rounded-2xl px-5 pb-7 pt-5 active:opacity-80',
+        colorClass
       )}>
       <View className="flex-row items-center justify-between">
         <Text className="text-sm text-neutral-500">{deck.cards} cards</Text>
         <ArrowUpRightIcon size={18} color="#111111" />
       </View>
-      <Text className="text-[30px] font-bold text-[#111111] -tracking-wide" numberOfLines={1}>
+      <Text className="text-[30px] font-bold -tracking-wide text-[#111111]" numberOfLines={1}>
         {deck.title}
       </Text>
     </Pressable>
@@ -109,12 +114,65 @@ function DeckCard({
 // ─── Home screen ──────────────────────────────────────────────────────────────
 export default function HomeScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+
   const [decks, setDecks] = React.useState<Deck[]>([]);
   const [isSearching, setIsSearching] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState('');
   const [isImporting, setIsImporting] = React.useState(false);
+  const [showCreateSheet, setShowCreateSheet] = React.useState(false);
   const searchInputRef = React.useRef<TextInput>(null);
 
+  // ── Nav bar hide/show on scroll ──────────────────────────────────────────────
+  const navTranslateY = React.useRef(new Animated.Value(0)).current;
+  const lastScrollY = React.useRef(0);
+
+  // ── Create sheet animations ───────────────────────────────────────────────────
+  const sheetY = React.useRef(new Animated.Value(600)).current;
+  const overlayOpacity = React.useRef(new Animated.Value(0)).current;
+
+  // Animate in whenever showCreateSheet flips to true
+  React.useEffect(() => {
+    if (showCreateSheet) {
+      sheetY.setValue(600);
+      overlayOpacity.setValue(0);
+      Animated.parallel([
+        Animated.timing(overlayOpacity, { toValue: 1, duration: 250, useNativeDriver: true }),
+        Animated.spring(sheetY, { toValue: 0, tension: 65, friction: 11, useNativeDriver: true }),
+      ]).start();
+    }
+  }, [showCreateSheet]);
+
+  const closeSheet = () => {
+    Animated.parallel([
+      Animated.timing(overlayOpacity, { toValue: 0, duration: 200, useNativeDriver: true }),
+      Animated.timing(sheetY, { toValue: 600, duration: 220, useNativeDriver: true }),
+    ]).start(() => setShowCreateSheet(false));
+  };
+
+  const handleScroll = (e: { nativeEvent: { contentOffset: { y: number } } }) => {
+    const y = e.nativeEvent.contentOffset.y;
+    const diff = y - lastScrollY.current;
+    lastScrollY.current = y;
+
+    if (diff > 6 && y > 40) {
+      Animated.spring(navTranslateY, {
+        toValue: 160,
+        useNativeDriver: true,
+        tension: 60,
+        friction: 12,
+      }).start();
+    } else if (diff < -6) {
+      Animated.spring(navTranslateY, {
+        toValue: 0,
+        useNativeDriver: true,
+        tension: 60,
+        friction: 12,
+      }).start();
+    }
+  };
+
+  // ── Data ─────────────────────────────────────────────────────────────────────
   const loadData = async () => {
     try {
       setDecks(await getDecks());
@@ -127,28 +185,23 @@ export default function HomeScreen() {
     loadData();
   }, []);
 
-  // Auto-focus input when entering search mode
   React.useEffect(() => {
-    if (isSearching) {
-      setTimeout(() => searchInputRef.current?.focus(), 50);
-    }
+    if (isSearching) setTimeout(() => searchInputRef.current?.focus(), 50);
   }, [isSearching]);
 
   const openSearch = () => {
     setSearchQuery('');
     setIsSearching(true);
   };
-
   const closeSearch = () => {
     setSearchQuery('');
     setIsSearching(false);
   };
 
-  // Fuzzy-filtered + scored decks
   const filteredDecks = React.useMemo(() => {
     if (!searchQuery.trim()) return decks;
     return decks
-      .map(deck => ({ deck, score: fuzzyScore(searchQuery, deck.title) }))
+      .map((deck) => ({ deck, score: fuzzyScore(searchQuery, deck.title) }))
       .filter(({ score }) => score > 0)
       .sort((a, b) => b.score - a.score)
       .map(({ deck }) => deck);
@@ -157,6 +210,7 @@ export default function HomeScreen() {
   const featuredDeck = decks[0] ?? null;
 
   const handleImport = async () => {
+    setShowCreateSheet(false);
     setIsImporting(true);
     try {
       const res = await importAnkiDeck();
@@ -173,29 +227,33 @@ export default function HomeScreen() {
     }
   };
 
+  // Nav bar bottom offset accounts for safe area
+  const navBottom = insets.bottom + 12;
+
   return (
-    <>
+    <View className="flex-1 bg-white">
       <Stack.Screen options={{ headerShown: false }} />
 
-      {/* ── Import toast ──────────────────────────────────── */}
+      {/* ── Import toast ────────────────────────────────────── */}
       {isImporting && (
-        <View className="absolute top-14 left-5 right-5 z-50 bg-[#111111] rounded-2xl px-5 py-3 flex-row items-center gap-3">
-          <View className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
-          <Text className="text-white text-sm font-medium">Importing deck…</Text>
+        <View className="absolute left-5 right-5 top-14 z-50 flex-row items-center gap-3 rounded-2xl bg-[#111111] px-5 py-3">
+          <View className="h-4 w-4 rounded-full border-2 border-white opacity-80" />
+          <Text className="text-sm font-medium text-white">Importing deck…</Text>
         </View>
       )}
 
+      {/* ── Scroll content ──────────────────────────────────── */}
       <ScrollView
-        className="flex-1 bg-white"
-        contentContainerClassName="pb-12"
-        showsVerticalScrollIndicator={false}>
-
-        {/* ── Hero / Search bar ─────────────────────────────── */}
-        <View className="bg-hero pt-14 px-6 pb-8 gap-6">
+        className="flex-1"
+        contentContainerStyle={{ paddingBottom: navBottom + 80 }}
+        showsVerticalScrollIndicator={false}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}>
+        {/* Hero / Search */}
+        <View className="gap-6 bg-hero px-6 pb-8 pt-14">
           {isSearching ? (
-            /* Search mode top bar */
             <View className="flex-row items-center gap-3">
-              <View className="flex-1 flex-row items-center gap-2 bg-white/60 rounded-full px-4 py-2.5">
+              <View className="flex-1 flex-row items-center gap-2 rounded-full bg-white/60 px-4 py-2.5">
                 <SearchIcon size={16} color="#555" />
                 <TextInput
                   ref={searchInputRef}
@@ -218,26 +276,23 @@ export default function HomeScreen() {
               </Pressable>
             </View>
           ) : (
-            /* Normal top bar */
             <>
               <View className="flex-row items-center justify-between">
-                <Pressable className="flex-row items-center gap-1.5 border-[1.5px] border-[#111111] rounded-full px-4 py-2">
+                <Pressable className="flex-row items-center gap-1.5 rounded-full border-[1.5px] border-[#111111] px-4 py-2">
                   <Text className="text-sm font-medium text-[#111111]">Arabic</Text>
                   <ChevronDownIcon size={14} color="#111111" />
                 </Pressable>
                 <Pressable
-                  className="w-10 h-10 rounded-full border-[1.5px] border-[#111111] items-center justify-center"
+                  className="h-10 w-10 items-center justify-center rounded-full border-[1.5px] border-[#111111]"
                   onPress={openSearch}>
                   <SearchIcon size={18} color="#111111" />
                 </Pressable>
               </View>
-
-              <Text className="text-5xl font-bold text-[#111111] leading-tight -tracking-wide">
+              <Text className="text-5xl font-bold leading-tight -tracking-wide text-[#111111]">
                 {'Words of\nthe day'}
               </Text>
-
               <View className="flex-row items-end justify-between">
-                <Text className="text-sm text-[#333333] leading-5">{'5 words\nper day'}</Text>
+                <Text className="text-sm leading-5 text-[#333333]">{'5 words\nper day'}</Text>
                 <Pressable>
                   <ArrowUpRightIcon size={20} color="#111111" />
                 </Pressable>
@@ -247,16 +302,15 @@ export default function HomeScreen() {
         </View>
 
         {isSearching ? (
-          /* ── Search results ───────────────────────────────── */
-          <View className="pt-6 gap-3">
-            <Text className="text-[11px] font-semibold tracking-widest text-neutral-400 px-5">
+          /* Search results */
+          <View className="gap-3 pt-6">
+            <Text className="px-5 text-[11px] font-semibold tracking-widest text-neutral-400">
               {filteredDecks.length === 0 && searchQuery
                 ? 'NO RESULTS'
                 : `${filteredDecks.length} DECK${filteredDecks.length !== 1 ? 'S' : ''}`}
             </Text>
-
             {filteredDecks.length === 0 && searchQuery ? (
-              <Text className="text-sm text-neutral-400 px-5 py-2">
+              <Text className="px-5 py-2 text-sm text-neutral-400">
                 No decks match "{searchQuery}"
               </Text>
             ) : (
@@ -276,11 +330,10 @@ export default function HomeScreen() {
             )}
           </View>
         ) : (
-          /* ── Normal home content ──────────────────────────── */
+          /* Normal content */
           <>
-            {/* Featured / Starter deck */}
             <View className="px-5 pt-5">
-              <View className="bg-starter-card rounded-2xl p-5 gap-4">
+              <View className="gap-4 rounded-2xl bg-starter-card p-5">
                 <View className="flex-row items-baseline justify-between">
                   <Text className="text-xl font-bold text-[#111111]">
                     {featuredDeck ? featuredDeck.title : 'Starter Deck'}
@@ -289,13 +342,11 @@ export default function HomeScreen() {
                     {featuredDeck ? `${featuredDeck.cards} cards` : '—'}
                   </Text>
                 </View>
-
                 <View className="items-center">
                   <Illustration width={280} />
                 </View>
-
                 <Pressable
-                  className="bg-brand rounded-full py-4 items-center active:opacity-80"
+                  className="items-center rounded-full bg-brand py-4 active:opacity-80"
                   onPress={() =>
                     featuredDeck ? router.push(`/deck/${featuredDeck.id}`) : undefined
                   }>
@@ -304,18 +355,15 @@ export default function HomeScreen() {
               </View>
             </View>
 
-            {/* Your Decks */}
-            <View className="pt-6 gap-3">
-              <Text className="text-[11px] font-semibold tracking-widest text-neutral-400 px-5">
+            <View className="gap-3 pt-6">
+              <Text className="px-5 text-[11px] font-semibold tracking-widest text-neutral-400">
                 YOUR DECKS
               </Text>
-
               {decks.length === 0 && (
-                <Text className="text-sm text-neutral-400 px-5 py-2">
-                  No decks yet — import one to get started.
+                <Text className="px-5 py-2 text-sm text-neutral-400">
+                  No decks yet — tap + to get started.
                 </Text>
               )}
-
               <View className="gap-[3px]">
                 {decks.map((deck, i) => (
                   <DeckCard
@@ -326,26 +374,103 @@ export default function HomeScreen() {
                   />
                 ))}
               </View>
-
-              {/* Actions */}
-              <View className="flex-row gap-3 px-5 pt-1">
-                <Pressable
-                  className="flex-1 flex-row items-center justify-center gap-2 py-3 rounded-xl border border-neutral-200 active:opacity-70"
-                  onPress={() => router.push('/deck/create')}>
-                  <PlusIcon size={16} color="#555" />
-                  <Text className="text-sm font-medium text-neutral-500">New deck</Text>
-                </Pressable>
-                <Pressable
-                  className="flex-1 flex-row items-center justify-center gap-2 py-3 rounded-xl border border-neutral-200 active:opacity-70"
-                  onPress={handleImport}>
-                  <DownloadIcon size={16} color="#555" />
-                  <Text className="text-sm font-medium text-neutral-500">Import Anki</Text>
-                </Pressable>
-              </View>
             </View>
           </>
         )}
       </ScrollView>
-    </>
+
+      {/* ── Floating nav bar ────────────────────────────────── */}
+      <Animated.View
+        style={{ transform: [{ translateY: navTranslateY }], bottom: navBottom }}
+        className="absolute left-12 right-12 items-center justify-center">
+        <View className="w-2/3 flex-row items-center justify-around rounded-full bg-[#111111] px-4 py-4">
+          <Pressable className="items-center justify-center active:opacity-70">
+            <HomeIcon size={22} color="#D7F005" strokeWidth={1.5} />
+          </Pressable>
+          <Pressable
+            className="items-center justify-center active:opacity-70"
+            onPress={() => setShowCreateSheet(true)}>
+            <PlusIcon size={22} color="white" strokeWidth={1.5} />
+          </Pressable>
+          <Pressable
+            className="items-center justify-center active:opacity-70"
+            onPress={() => Alert.alert('Settings', 'Coming soon')}>
+            <SettingsIcon size={22} color="white" strokeWidth={1.5} />
+          </Pressable>
+        </View>
+      </Animated.View>
+
+      {/* ── Create deck bottom sheet ─────────────────────────── */}
+      <Modal visible={showCreateSheet} transparent animationType="none" onRequestClose={closeSheet}>
+        <View className="flex-1">
+          {/* Backdrop: fades in (visual only, pointerEvents="none") */}
+          <Animated.View
+            className="absolute inset-0 bg-black/40"
+            style={{ opacity: overlayOpacity }}
+            pointerEvents="none"
+          />
+          {/* Backdrop tap target: sits behind the sheet in z-order */}
+          <Pressable className="flex-1" onPress={closeSheet} />
+
+          {/* Sheet: rendered after the backdrop so it sits on top and captures touches */}
+          <Animated.View
+            className="absolute bottom-0 left-0 right-0"
+            style={{ transform: [{ translateY: sheetY }] }}>
+            {/* Inner View with onStartShouldSetResponder so touches don't reach the backdrop */}
+            <View
+              className="rounded-t-3xl bg-white px-6 pb-12 pt-6"
+              // eslint-disable-next-line react-native/no-inline-styles
+              onStartShouldSetResponder={() => true}>
+              {/* Header */}
+              <View className="mb-8 flex-row items-center">
+                <Pressable
+                  hitSlop={12}
+                  className="h-8 w-8 items-center justify-center"
+                  onPress={closeSheet}>
+                  <XIcon size={20} color="#111111" strokeWidth={1.5} />
+                </Pressable>
+                <Text className="-ml-8 flex-1 text-center text-lg font-semibold text-[#111111]">
+                  Create a deck
+                </Text>
+              </View>
+
+              {/* Options */}
+              <View className="flex-row justify-around pb-4">
+                <Pressable
+                  className="items-center gap-3 active:opacity-70"
+                  onPress={() => {
+                    setShowCreateSheet(false);
+                    Alert.alert('With AI', 'Coming soon!');
+                  }}>
+                  <View className="h-20 w-20 items-center justify-center rounded-full bg-brand">
+                    <SparklesIcon size={30} color="#111111" strokeWidth={1.3} />
+                  </View>
+                  <Text className="text-sm font-medium text-[#111111]">With AI</Text>
+                </Pressable>
+
+                <Pressable
+                  className="items-center gap-3 active:opacity-70"
+                  onPress={() => {
+                    setShowCreateSheet(false);
+                    router.push('/deck/create');
+                  }}>
+                  <View className="h-20 w-20 items-center justify-center rounded-full bg-brand">
+                    <LayersPlusIcon size={30} color="#111111" strokeWidth={1.3} />
+                  </View>
+                  <Text className="text-sm font-medium text-[#111111]">Manually</Text>
+                </Pressable>
+
+                <Pressable className="items-center gap-3 active:opacity-70" onPress={handleImport}>
+                  <View className="h-20 w-20 items-center justify-center rounded-full bg-brand">
+                    <DownloadIcon size={30} color="#111111" strokeWidth={1.3} />
+                  </View>
+                  <Text className="text-sm font-medium text-[#111111]">Import</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Animated.View>
+        </View>
+      </Modal>
+    </View>
   );
 }
