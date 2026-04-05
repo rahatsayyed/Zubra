@@ -1,5 +1,6 @@
 import '@/global.css';
 
+import { LoadingScreen } from '@/components/loading-screen';
 import { NAV_THEME } from '@/lib/theme';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
@@ -7,8 +8,8 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import { useEffect, useState } from 'react';
-import { View, ActivityIndicator } from 'react-native';
 import { initDatabase } from '@/lib/data/database';
+
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -33,11 +34,7 @@ export default function RootLayout() {
   }, []);
 
   if (!isDbReady) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
+    return <LoadingScreen />;
   }
 
   return (
