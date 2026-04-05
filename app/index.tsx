@@ -9,13 +9,36 @@ import {
   DownloadIcon,
   PlusIcon,
   SearchIcon,
+  XIcon,
 } from 'lucide-react-native';
 import * as React from 'react';
-import { Alert, Pressable, ScrollView, View } from 'react-native';
+import { Alert, Pressable, ScrollView, TextInput, View } from 'react-native';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 
 // ─── Deck card colour classes (full strings so NativeWind can detect them) ────
 const DECK_COLOR_CLASSES = ['bg-deck-1', 'bg-deck-2', 'bg-deck-3', 'bg-deck-4'] as const;
+
+// ─── Fuzzy search ─────────────────────────────────────────────────────────────
+// Returns a score > 0 if all query chars appear in order in target, else 0.
+// Higher score = tighter match (fewer gaps between matched chars).
+function fuzzyScore(query: string, target: string): number {
+  const q = query.toLowerCase().trim();
+  const t = target.toLowerCase();
+  if (!q) return 1;
+  let qi = 0;
+  let score = 0;
+  let consecutive = 0;
+  for (let i = 0; i < t.length && qi < q.length; i++) {
+    if (t[i] === q[qi]) {
+      qi++;
+      consecutive++;
+      score += consecutive; // reward consecutive matches
+    } else {
+      consecutive = 0;
+    }
+  }
+  return qi === q.length ? score : 0;
+}
 
 // ─── Characters illustration (inline SVG, viewBox 767 × 469) ─────────────────
 function Illustration({ width = 300 }: { width?: number }) {
@@ -87,6 +110,10 @@ function DeckCard({
 export default function HomeScreen() {
   const router = useRouter();
   const [decks, setDecks] = React.useState<Deck[]>([]);
+  const [isSearching, setIsSearching] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [isImporting, setIsImporting] = React.useState(false);
+  const searchInputRef = React.useRef<TextInput>(null);
 
   const loadData = async () => {
     try {
@@ -100,122 +127,224 @@ export default function HomeScreen() {
     loadData();
   }, []);
 
+  // Auto-focus input when entering search mode
+  React.useEffect(() => {
+    if (isSearching) {
+      setTimeout(() => searchInputRef.current?.focus(), 50);
+    }
+  }, [isSearching]);
+
+  const openSearch = () => {
+    setSearchQuery('');
+    setIsSearching(true);
+  };
+
+  const closeSearch = () => {
+    setSearchQuery('');
+    setIsSearching(false);
+  };
+
+  // Fuzzy-filtered + scored decks
+  const filteredDecks = React.useMemo(() => {
+    if (!searchQuery.trim()) return decks;
+    return decks
+      .map(deck => ({ deck, score: fuzzyScore(searchQuery, deck.title) }))
+      .filter(({ score }) => score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map(({ deck }) => deck);
+  }, [decks, searchQuery]);
+
   const featuredDeck = decks[0] ?? null;
 
   const handleImport = async () => {
+    setIsImporting(true);
     try {
       const res = await importAnkiDeck();
       if (res?.success) {
+        await loadData();
         Alert.alert('Success', `Imported ${res.count} cards`);
-        loadData();
       } else if (res?.message !== 'Import cancelled') {
         Alert.alert('Error', res?.message || 'Failed to import');
       }
     } catch (e: any) {
       Alert.alert('Error', e.message);
+    } finally {
+      setIsImporting(false);
     }
   };
 
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
+
+      {/* ── Import toast ──────────────────────────────────── */}
+      {isImporting && (
+        <View className="absolute top-14 left-5 right-5 z-50 bg-[#111111] rounded-2xl px-5 py-3 flex-row items-center gap-3">
+          <View className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+          <Text className="text-white text-sm font-medium">Importing deck…</Text>
+        </View>
+      )}
+
       <ScrollView
         className="flex-1 bg-white"
         contentContainerClassName="pb-12"
         showsVerticalScrollIndicator={false}>
 
-        {/* ── Hero ──────────────────────────────────────────── */}
+        {/* ── Hero / Search bar ─────────────────────────────── */}
         <View className="bg-hero pt-14 px-6 pb-8 gap-6">
-          {/* Top bar */}
-          <View className="flex-row items-center justify-between">
-            <Pressable className="flex-row items-center gap-1.5 border-[1.5px] border-[#111111] rounded-full px-4 py-2">
-              <Text className="text-sm font-medium text-[#111111]">Arabic</Text>
-              <ChevronDownIcon size={14} color="#111111" />
-            </Pressable>
-            <Pressable className="w-10 h-10 rounded-full border-[1.5px] border-[#111111] items-center justify-center">
-              <SearchIcon size={18} color="#111111" />
-            </Pressable>
-          </View>
-
-          {/* Heading */}
-          <Text className="text-5xl font-bold text-[#111111] leading-tight -tracking-wide">
-            {'Words of\nthe day'}
-          </Text>
-
-          {/* Footer */}
-          <View className="flex-row items-end justify-between">
-            <Text className="text-sm text-[#333333] leading-5">{'5 words\nper day'}</Text>
-            <Pressable>
-              <ArrowUpRightIcon size={20} color="#111111" />
-            </Pressable>
-          </View>
-        </View>
-
-        {/* ── Featured / Starter deck ───────────────────────── */}
-        <View className="px-5 pt-5">
-          <View className="bg-starter-card rounded-2xl p-5 gap-4">
-            <View className="flex-row items-baseline justify-between">
-              <Text className="text-xl font-bold text-[#111111]">
-                {featuredDeck ? featuredDeck.title : 'Starter Deck'}
-              </Text>
-              <Text className="text-sm text-neutral-500">
-                {featuredDeck ? `${featuredDeck.cards} cards` : '—'}
-              </Text>
+          {isSearching ? (
+            /* Search mode top bar */
+            <View className="flex-row items-center gap-3">
+              <View className="flex-1 flex-row items-center gap-2 bg-white/60 rounded-full px-4 py-2.5">
+                <SearchIcon size={16} color="#555" />
+                <TextInput
+                  ref={searchInputRef}
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                  placeholder="Search decks…"
+                  placeholderTextColor="#888"
+                  className="flex-1 text-sm text-[#111111]"
+                  returnKeyType="search"
+                  autoCorrect={false}
+                />
+                {searchQuery.length > 0 && (
+                  <Pressable onPress={() => setSearchQuery('')}>
+                    <XIcon size={14} color="#888" />
+                  </Pressable>
+                )}
+              </View>
+              <Pressable onPress={closeSearch}>
+                <Text className="text-sm font-medium text-[#111111]">Cancel</Text>
+              </Pressable>
             </View>
+          ) : (
+            /* Normal top bar */
+            <>
+              <View className="flex-row items-center justify-between">
+                <Pressable className="flex-row items-center gap-1.5 border-[1.5px] border-[#111111] rounded-full px-4 py-2">
+                  <Text className="text-sm font-medium text-[#111111]">Arabic</Text>
+                  <ChevronDownIcon size={14} color="#111111" />
+                </Pressable>
+                <Pressable
+                  className="w-10 h-10 rounded-full border-[1.5px] border-[#111111] items-center justify-center"
+                  onPress={openSearch}>
+                  <SearchIcon size={18} color="#111111" />
+                </Pressable>
+              </View>
 
-            <View className="items-center">
-              <Illustration width={280} />
-            </View>
+              <Text className="text-5xl font-bold text-[#111111] leading-tight -tracking-wide">
+                {'Words of\nthe day'}
+              </Text>
 
-            <Pressable
-              className="bg-brand rounded-full py-4 items-center active:opacity-80"
-              onPress={() =>
-                featuredDeck ? router.push(`/deck/${featuredDeck.id}`) : undefined
-              }>
-              <Text className="text-base font-semibold text-[#111111]">Start Practising</Text>
-            </Pressable>
-          </View>
-        </View>
-
-        {/* ── Your Decks ────────────────────────────────────── */}
-        <View className="pt-6 gap-3">
-          <Text className="text-[11px] font-semibold tracking-widest text-neutral-400 px-5">
-            YOUR DECKS
-          </Text>
-
-          {decks.length === 0 && (
-            <Text className="text-sm text-neutral-400 px-5 py-2">
-              No decks yet — import one to get started.
-            </Text>
+              <View className="flex-row items-end justify-between">
+                <Text className="text-sm text-[#333333] leading-5">{'5 words\nper day'}</Text>
+                <Pressable>
+                  <ArrowUpRightIcon size={20} color="#111111" />
+                </Pressable>
+              </View>
+            </>
           )}
-
-          <View className="gap-[3px]">
-            {decks.map((deck, i) => (
-              <DeckCard
-                key={deck.id}
-                deck={deck}
-                colorClass={DECK_COLOR_CLASSES[i % DECK_COLOR_CLASSES.length]}
-                onPress={() => router.push(`/deck/${deck.id}`)}
-              />
-            ))}
-          </View>
-
-          {/* Actions */}
-          <View className="flex-row gap-3 px-5 pt-1">
-            <Pressable
-              className="flex-1 flex-row items-center justify-center gap-2 py-3 rounded-xl border border-neutral-200 active:opacity-70"
-              onPress={() => router.push('/deck/create')}>
-              <PlusIcon size={16} color="#555" />
-              <Text className="text-sm font-medium text-neutral-500">New deck</Text>
-            </Pressable>
-            <Pressable
-              className="flex-1 flex-row items-center justify-center gap-2 py-3 rounded-xl border border-neutral-200 active:opacity-70"
-              onPress={handleImport}>
-              <DownloadIcon size={16} color="#555" />
-              <Text className="text-sm font-medium text-neutral-500">Import Anki</Text>
-            </Pressable>
-          </View>
         </View>
+
+        {isSearching ? (
+          /* ── Search results ───────────────────────────────── */
+          <View className="pt-6 gap-3">
+            <Text className="text-[11px] font-semibold tracking-widest text-neutral-400 px-5">
+              {filteredDecks.length === 0 && searchQuery
+                ? 'NO RESULTS'
+                : `${filteredDecks.length} DECK${filteredDecks.length !== 1 ? 'S' : ''}`}
+            </Text>
+
+            {filteredDecks.length === 0 && searchQuery ? (
+              <Text className="text-sm text-neutral-400 px-5 py-2">
+                No decks match "{searchQuery}"
+              </Text>
+            ) : (
+              <View className="gap-[3px]">
+                {filteredDecks.map((deck, i) => (
+                  <DeckCard
+                    key={deck.id}
+                    deck={deck}
+                    colorClass={DECK_COLOR_CLASSES[i % DECK_COLOR_CLASSES.length]}
+                    onPress={() => {
+                      closeSearch();
+                      router.push(`/deck/${deck.id}`);
+                    }}
+                  />
+                ))}
+              </View>
+            )}
+          </View>
+        ) : (
+          /* ── Normal home content ──────────────────────────── */
+          <>
+            {/* Featured / Starter deck */}
+            <View className="px-5 pt-5">
+              <View className="bg-starter-card rounded-2xl p-5 gap-4">
+                <View className="flex-row items-baseline justify-between">
+                  <Text className="text-xl font-bold text-[#111111]">
+                    {featuredDeck ? featuredDeck.title : 'Starter Deck'}
+                  </Text>
+                  <Text className="text-sm text-neutral-500">
+                    {featuredDeck ? `${featuredDeck.cards} cards` : '—'}
+                  </Text>
+                </View>
+
+                <View className="items-center">
+                  <Illustration width={280} />
+                </View>
+
+                <Pressable
+                  className="bg-brand rounded-full py-4 items-center active:opacity-80"
+                  onPress={() =>
+                    featuredDeck ? router.push(`/deck/${featuredDeck.id}`) : undefined
+                  }>
+                  <Text className="text-base font-semibold text-[#111111]">Start Practising</Text>
+                </Pressable>
+              </View>
+            </View>
+
+            {/* Your Decks */}
+            <View className="pt-6 gap-3">
+              <Text className="text-[11px] font-semibold tracking-widest text-neutral-400 px-5">
+                YOUR DECKS
+              </Text>
+
+              {decks.length === 0 && (
+                <Text className="text-sm text-neutral-400 px-5 py-2">
+                  No decks yet — import one to get started.
+                </Text>
+              )}
+
+              <View className="gap-[3px]">
+                {decks.map((deck, i) => (
+                  <DeckCard
+                    key={deck.id}
+                    deck={deck}
+                    colorClass={DECK_COLOR_CLASSES[i % DECK_COLOR_CLASSES.length]}
+                    onPress={() => router.push(`/deck/${deck.id}`)}
+                  />
+                ))}
+              </View>
+
+              {/* Actions */}
+              <View className="flex-row gap-3 px-5 pt-1">
+                <Pressable
+                  className="flex-1 flex-row items-center justify-center gap-2 py-3 rounded-xl border border-neutral-200 active:opacity-70"
+                  onPress={() => router.push('/deck/create')}>
+                  <PlusIcon size={16} color="#555" />
+                  <Text className="text-sm font-medium text-neutral-500">New deck</Text>
+                </Pressable>
+                <Pressable
+                  className="flex-1 flex-row items-center justify-center gap-2 py-3 rounded-xl border border-neutral-200 active:opacity-70"
+                  onPress={handleImport}>
+                  <DownloadIcon size={16} color="#555" />
+                  <Text className="text-sm font-medium text-neutral-500">Import Anki</Text>
+                </Pressable>
+              </View>
+            </View>
+          </>
+        )}
       </ScrollView>
     </>
   );
