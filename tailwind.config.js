@@ -8,6 +8,15 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // ── Brand / screen-level palette ──────────────────
+        hero: '#C9D8C5',
+        'starter-card': '#FFE0FE',
+        brand: '#D7F005',
+        'deck-1': '#F4E7D3',
+        'deck-2': '#D7E2F2',
+        'deck-3': '#FFE3F3',
+        'deck-4': '#EADFF6',
+        // ── Design-system tokens ──────────────────────────
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
