@@ -1,5 +1,5 @@
 import { Text } from '@/components/ui/text';
-import { Illustration } from '@/components/illustration';
+import { HomeIllustration } from '@/components/home-illustration';
 import { Flowers } from '@/components/flowers';
 import { getDecks, Deck, isOnboardingComplete } from '@/lib/data/api';
 import { importAnkiDeck } from '@/lib/data/ankiImport';
@@ -237,7 +237,7 @@ export default function HomeScreen() {
         onScroll={handleScroll}
         scrollEventThrottle={16}>
         {/* Hero / Search */}
-        <View className="relative gap-6 overflow-hidden bg-hero px-6 pb-8 pt-20">
+        <View className="relative gap-6 overflow-hidden bg-hero px-6 pb-8 pt-14">
           <View className="absolute left-0 right-0 top-0" pointerEvents="none">
             <Flowers width={Dimensions.get('window').width} />
           </View>
@@ -332,8 +332,8 @@ export default function HomeScreen() {
                     {featuredDeck ? `${featuredDeck.cards} cards` : '—'}
                   </Text>
                 </View>
-                <View className="items-center">
-                  <Illustration width={280} />
+                <View>
+                  <HomeIllustration width={Dimensions.get('window').width - 48} />
                 </View>
                 <Pressable
                   className="items-center rounded-full bg-brand py-4 active:opacity-80"
