@@ -171,54 +171,61 @@ export default function StudyScreen() {
 
             {/* Card stack — two shorter, narrower cards peeking out behind the front card */}
             <View className="flex-1 items-center justify-center">
-              <View className="relative w-full max-w-[350px] self-center" style={{ height: 420 }}>
+              <View className="relative w-full max-w-[350px] self-center" style={{ height: 560 }}>
                 <View
                   className="absolute rounded-xl"
-                  style={{ top: 20, left: 27, right: 27, height: 420, backgroundColor: '#F3F3F3' }}
+                  style={{ top: 26, left: 32, right: 32, height: 560, backgroundColor: '#F3F3F3' }}
                 />
                 <View
                   className="absolute rounded-xl"
-                  style={{ top: 10, left: 14, right: 14, height: 420, backgroundColor: '#F8F8F8' }}
+                  style={{ top: 13, left: 16, right: 16, height: 560, backgroundColor: '#F8F8F8' }}
                 />
-                <View className="absolute inset-0 items-center justify-center gap-6 rounded-xl bg-white p-6">
-                  <Text className="text-center text-4xl text-[#111111]">
-                    {currentCard?.question}
-                  </Text>
-                  {showAnswer && (
-                    <>
-                      <View className="h-px w-12 bg-[#111111]/30" />
-                      <Text className="text-center text-2xl text-[#111111]">
-                        {currentCard?.answer}
-                      </Text>
-                    </>
-                  )}
+                <View className="absolute inset-0 overflow-hidden rounded-xl bg-white">
+                  <View
+                    className="flex-1 items-center justify-center gap-6 p-6"
+                    style={{ paddingBottom: showAnswer ? 110 : 60 }}>
+                    <Text className="text-center text-4xl text-[#111111]">
+                      {currentCard?.question}
+                    </Text>
+                    {showAnswer && (
+                      <>
+                        <View className="h-px w-12 bg-[#111111]/30" />
+                        <Text className="text-center text-2xl text-[#111111]">
+                          {currentCard?.answer}
+                        </Text>
+                      </>
+                    )}
+                  </View>
+
                   {!showAnswer && (
+                    // Tapping the bottom ~20% of the card reveals the answer,
+                    // not just the "Show Answer" label itself.
                     <Pressable
-                      className="absolute bottom-6 items-center active:opacity-70"
+                      className="absolute bottom-0 left-0 right-0 items-center justify-center active:opacity-70"
+                      style={{ height: '20%' }}
                       onPress={() => setShowAnswer(true)}>
                       <Text className="text-base text-[#9B9B9B]">Show Answer</Text>
                     </Pressable>
                   )}
+
+                  {showAnswer && (
+                    <View className="absolute bottom-4 left-4 right-4 flex-row gap-2">
+                      {RATING_OPTIONS.map((opt) => (
+                        <Pressable
+                          key={opt.label}
+                          className={`flex-1 items-center justify-center gap-0.5 rounded-xl py-4 active:opacity-70 ${opt.bg}`}
+                          onPress={() => handleRate(opt.rating)}>
+                          <Text className="text-xs font-medium tracking-widest text-[#111111]">
+                            {opt.label}
+                          </Text>
+                          <Text className="text-[10px] text-[#111111]/70">{opt.time}</Text>
+                        </Pressable>
+                      ))}
+                    </View>
+                  )}
                 </View>
               </View>
             </View>
-
-            {/* Rating row */}
-            {showAnswer && (
-              <View className="flex-row gap-2">
-                {RATING_OPTIONS.map((opt) => (
-                  <Pressable
-                    key={opt.label}
-                    className={`flex-1 items-center justify-center gap-0.5 rounded-xl py-4 active:opacity-70 ${opt.bg}`}
-                    onPress={() => handleRate(opt.rating)}>
-                    <Text className="text-xs font-medium tracking-widest text-[#111111]">
-                      {opt.label}
-                    </Text>
-                    <Text className="text-[10px] text-[#111111]/70">{opt.time}</Text>
-                  </Pressable>
-                ))}
-              </View>
-            )}
           </View>
         )}
       </View>
