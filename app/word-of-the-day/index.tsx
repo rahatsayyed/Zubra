@@ -44,7 +44,7 @@ export default function WordOfTheDayScreen() {
 
   const handleAdd = () => {
     router.push({
-      pathname: '/word-of-the-day/select-deck',
+      pathname: '/search',
       params: { arabic: word.arabic, translation: word.translation },
     });
   };

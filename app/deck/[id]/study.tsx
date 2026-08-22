@@ -98,7 +98,7 @@ export default function StudyScreen() {
   return (
     <>
       <Stack.Screen options={{ headerShown: false, presentation: 'fullScreenModal' }} />
-      <View className={`flex-1 ${bgClass}`} style={{ paddingTop: insets.top + 24 }}>
+      <View className={`flex-1 ${bgClass}`}>
         {loading ? (
           <View className="flex-1 items-center justify-center">
             <Text className="text-[#111111]">Preparing your session…</Text>
@@ -116,7 +116,9 @@ export default function StudyScreen() {
             </Pressable>
           </View>
         ) : isFinished ? (
-          <View className="flex-1 bg-hero px-6 pb-8">
+          <View
+            className="flex-1 bg-hero px-6"
+            style={{ paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 }}>
             <Text className="pt-4 text-center font-andada text-[32px] leading-tight text-[#111111]">
               Session Complete
             </Text>
@@ -138,7 +140,7 @@ export default function StudyScreen() {
             </Pressable>
           </View>
         ) : (
-          <View className="flex-1 px-4 pb-6">
+          <View className="flex-1 px-4 pb-6" style={{ paddingTop: insets.top + 24 }}>
             {/* Header */}
             <View className="gap-4">
               <View className="flex-row items-center justify-between">
