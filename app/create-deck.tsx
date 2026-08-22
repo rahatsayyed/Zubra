@@ -51,16 +51,14 @@ export default function CreateDeckScreen() {
       <Pressable className="flex-1" onPress={() => router.back()} />
 
       <View className="rounded-t-3xl bg-white px-6 pb-12 pt-6">
-        <View className="mb-8 flex-row items-center">
+        <View className="mb-8 flex-row items-center justify-center">
           <Pressable
             hitSlop={12}
             className="absolute left-0 h-6 w-6 items-center justify-center"
             onPress={() => router.back()}>
             <Iconify icon="fluent:dismiss-20-filled" size={20} color="#111111" />
           </Pressable>
-          <Text className="-ml-8 flex-1 text-center text-lg font-semibold text-[#111111]">
-            Create a deck
-          </Text>
+          <Text className="text-lg font-semibold text-[#111111]">Create a deck</Text>
         </View>
 
         <View className="flex-row justify-around pb-4">
