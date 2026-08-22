@@ -298,7 +298,7 @@ export default function HomeScreen() {
         ) : (
           /* Normal content */
           <>
-            <View className="px-5 pt-5">
+            <View className="px-2 pt-2">
               <View className="gap-4 rounded-2xl bg-starter-card p-5">
                 <View className="flex-row items-baseline justify-between">
                   <Text className="text-xl font-bold text-[#111111]">
@@ -330,7 +330,7 @@ export default function HomeScreen() {
                   No decks yet — tap + to get started.
                 </Text>
               )}
-              <View className="gap-[3px]">
+              <View className="gap-[3px] px-2">
                 {decks.map((deck, i) => (
                   <DeckCard
                     key={deck.id}

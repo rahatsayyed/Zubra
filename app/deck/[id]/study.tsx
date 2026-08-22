@@ -169,16 +169,16 @@ export default function StudyScreen() {
               </View>
             </View>
 
-            {/* Card stack */}
+            {/* Card stack — two shorter, narrower cards peeking out behind the front card */}
             <View className="flex-1 items-center justify-center">
               <View className="relative w-full max-w-[350px] self-center" style={{ height: 420 }}>
                 <View
-                  className="absolute left-2 right-2 top-4 rounded-xl bg-black/5"
-                  style={{ bottom: -16 }}
+                  className="absolute rounded-xl"
+                  style={{ top: 20, left: 27, right: 27, height: 420, backgroundColor: '#F3F3F3' }}
                 />
                 <View
-                  className="absolute left-1 right-1 top-2 rounded-xl bg-black/10"
-                  style={{ bottom: -8 }}
+                  className="absolute rounded-xl"
+                  style={{ top: 10, left: 14, right: 14, height: 420, backgroundColor: '#F8F8F8' }}
                 />
                 <View className="absolute inset-0 items-center justify-center gap-6 rounded-xl bg-white p-6">
                   <Text className="text-center text-4xl text-[#111111]">
