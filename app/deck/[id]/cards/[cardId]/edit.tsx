@@ -41,8 +41,6 @@ export default function EditCardScreen() {
     }
   };
 
-  if (loading) return null;
-
   return (
     <View className="flex-1 justify-end bg-black/60">
       <Stack.Screen
@@ -53,6 +51,7 @@ export default function EditCardScreen() {
           animation: 'fade',
         }}
       />
+      {loading ? null : (
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1 justify-end">
@@ -92,6 +91,7 @@ export default function EditCardScreen() {
           </Pressable>
         </View>
       </KeyboardAvoidingView>
+      )}
     </View>
   );
 }

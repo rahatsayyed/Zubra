@@ -63,8 +63,6 @@ export default function EditDeckScreen() {
     );
   };
 
-  if (loading) return null;
-
   return (
     <View className="flex-1 justify-end bg-black/60">
       <Stack.Screen
@@ -75,6 +73,7 @@ export default function EditDeckScreen() {
           animation: 'fade',
         }}
       />
+      {loading ? null : (
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1 justify-end">
@@ -124,6 +123,7 @@ export default function EditDeckScreen() {
           </View>
         </View>
       </KeyboardAvoidingView>
+      )}
     </View>
   );
 }
