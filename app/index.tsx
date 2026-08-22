@@ -281,9 +281,9 @@ export default function HomeScreen() {
               <Text className="text-5xl font-bold leading-tight -tracking-wide text-[#111111]">
                 {'Words of\nthe day'}
               </Text>
-              <View className="flex-row items-end justify-between">
+              <View className="w-full">
+                <Pressable onPress={() => router.push('/word-of-the-day')} className="flex-row items-end justify-between">
                 <Text className="text-sm leading-5 text-[#333333]">{'5 words\nper day'}</Text>
-                <Pressable>
                   <ArrowUpRightIcon size={20} color="#111111" />
                 </Pressable>
               </View>

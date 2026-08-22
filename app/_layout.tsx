@@ -1,3 +1,4 @@
+// @@iconify-code-gen
 import '@/global.css';
 
 import { LoadingScreen } from '@/components/loading-screen';
