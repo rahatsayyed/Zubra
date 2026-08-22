@@ -28,7 +28,7 @@ export function Navbar({ bottom, onCreatePress }: NavbarProps) {
           className="items-center justify-center active:opacity-70"
           onPress={() => router.push('/')}>
           <Iconify
-            icon="material-symbols-light:home-rounded"
+            icon={isHome ?"material-symbols-light:home-rounded" : "material-symbols-light:home-outline-rounded"}
             size={28}
             color={isHome ? '#D7F005' : 'white'}
           />
@@ -40,7 +40,7 @@ export function Navbar({ bottom, onCreatePress }: NavbarProps) {
           className="items-center justify-center active:opacity-70"
           onPress={() => router.push('/settings')}>
           <Iconify
-            icon="material-symbols-light:settings-outline-rounded"
+            icon={isSettings? "material-symbols-light:settings-rounded" : "material-symbols-light:settings-outline-rounded"}
             size={28}
             color={isSettings ? '#D7F005' : 'white'}
           />
