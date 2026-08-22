@@ -91,6 +91,11 @@ export const initDatabase = async () => {
           FOREIGN KEY (deck_id) REFERENCES decks (id) ON DELETE CASCADE
         );
 
+        CREATE TABLE IF NOT EXISTS settings (
+          key TEXT PRIMARY KEY NOT NULL,
+          value TEXT NOT NULL
+        );
+
         CREATE INDEX IF NOT EXISTS idx_cards_due ON cards(due);
         CREATE INDEX IF NOT EXISTS idx_cards_deck_due ON cards(deck_id, due);
         CREATE INDEX IF NOT EXISTS idx_review_logs_card ON card_review_logs(card_id);

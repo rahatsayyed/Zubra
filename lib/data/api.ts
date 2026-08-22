@@ -517,6 +517,28 @@ export const deleteCard = async (cardId: string): Promise<void> => {
   }
 };
 
+export const getSetting = async (key: string): Promise<string | null> => {
+  const rows = await querySql('SELECT value FROM settings WHERE key = ?', [key]);
+  return rows.length > 0 ? rows[0].value : null;
+};
+
+export const setSetting = async (key: string, value: string): Promise<void> => {
+  await executeSql(
+    'INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value',
+    [key, value]
+  );
+};
+
+export const isOnboardingComplete = async (): Promise<boolean> => {
+  return (await getSetting('onboarding_complete')) === 'true';
+};
+
+export const completeOnboarding = async (language: string, fluency: string): Promise<void> => {
+  await setSetting('onboarding_language', language);
+  await setSetting('onboarding_fluency', fluency);
+  await setSetting('onboarding_complete', 'true');
+};
+
 export const getDueCards = async (deckId: string): Promise<Card[]> => {
   const now = new Date().toISOString();
   // Fetch cards where Due Date is passed, OR due is null (brand new imported cards)

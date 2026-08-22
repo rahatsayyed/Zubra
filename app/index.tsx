@@ -1,6 +1,6 @@
 import { Text } from '@/components/ui/text';
 import { Illustration } from '@/components/illustration';
-import { getDecks, Deck } from '@/lib/data/api';
+import { getDecks, Deck, isOnboardingComplete } from '@/lib/data/api';
 import { importAnkiDeck } from '@/lib/data/ankiImport';
 import { cn } from '@/lib/utils';
 import { Stack, useFocusEffect, useRouter } from 'expo-router';
@@ -83,7 +83,25 @@ export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [isImporting, setIsImporting] = React.useState(false);
   const [showCreateSheet, setShowCreateSheet] = React.useState(false);
+  const [onboardingChecked, setOnboardingChecked] = React.useState(false);
   const searchInputRef = React.useRef<TextInput>(null);
+
+  // Send first-time users through onboarding, once, before showing Home.
+  React.useEffect(() => {
+    const checkOnboarding = async () => {
+      try {
+        const done = await isOnboardingComplete();
+        if (!done) {
+          router.replace('/onboarding');
+          return;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+      setOnboardingChecked(true);
+    };
+    checkOnboarding();
+  }, []);
 
   // ── Nav bar hide/show on scroll ──────────────────────────────────────────────
   const navTranslateY = React.useRef(new Animated.Value(0)).current;
@@ -195,6 +213,8 @@ export default function HomeScreen() {
 
   // Nav bar bottom offset accounts for safe area
   const navBottom = insets.bottom + 12;
+
+  if (!onboardingChecked) return null;
 
   return (
     <View className="flex-1 bg-white">
