@@ -1,5 +1,6 @@
 import { Text } from '@/components/ui/text';
 import { Illustration } from '@/components/illustration';
+import { Flowers } from '@/components/flowers';
 import { getDecks, Deck, isOnboardingComplete } from '@/lib/data/api';
 import { importAnkiDeck } from '@/lib/data/ankiImport';
 import { cn } from '@/lib/utils';
@@ -17,7 +18,7 @@ import {
   LayersPlusIcon,
 } from 'lucide-react-native';
 import * as React from 'react';
-import { Alert, Animated, Modal, Pressable, ScrollView, TextInput, View } from 'react-native';
+import { Alert, Animated, Dimensions, Modal, Pressable, ScrollView, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // ─── Deck card colour classes (full strings so NativeWind can detect them) ────
@@ -236,7 +237,10 @@ export default function HomeScreen() {
         onScroll={handleScroll}
         scrollEventThrottle={16}>
         {/* Hero / Search */}
-        <View className="gap-6 bg-hero px-6 pb-8 pt-14">
+        <View className="relative gap-6 overflow-hidden bg-hero px-6 pb-8 pt-20">
+          <View className="absolute left-0 right-0 top-0" pointerEvents="none">
+            <Flowers width={Dimensions.get('window').width} />
+          </View>
           {isSearching ? (
             <View className="flex-row items-center gap-3">
               <View className="flex-1 flex-row items-center gap-2 rounded-full bg-white/60 px-4 py-2.5">

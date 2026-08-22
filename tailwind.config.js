@@ -11,7 +11,7 @@ module.exports = {
         // ── Brand / screen-level palette ──────────────────
         hero: '#C9D8C5',
         'starter-card': '#FFE0FE',
-        brand: '#D7F005',
+        brand: '#DDF700',
         'deck-1': '#F4E7D3',
         'deck-2': '#D7E2F2',
         'deck-3': '#FFE3F3',

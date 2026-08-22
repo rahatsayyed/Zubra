@@ -3,7 +3,7 @@ import { View, Modal, Pressable, TextInput } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { Text } from '@/components/ui/text';
 import { OptionSheet } from '@/components/option-sheet';
-import { ChevronLeft, MoreHorizontal, ListChecks, Pencil, X } from 'lucide-react-native';
+import { ChevronLeft, MoreHorizontal, ListChecks, Pencil, Plus, X } from 'lucide-react-native';
 import { getDeck, getDeckMastery, Deck, DifficultyBand } from '@/lib/data/api';
 import { getDeckColorClass } from '@/lib/utils';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -104,14 +104,19 @@ export default function DeckDetailScreen() {
         onClose={() => setShowMenu(false)}
         options={[
           {
-            label: 'Manage Cards',
-            icon: ListChecks,
-            onPress: () => router.push(`/deck/${id}/cards`),
-          },
-          {
             label: 'Edit Deck',
             icon: Pencil,
             onPress: () => router.push(`/deck/${id}/edit`),
+          },
+          {
+            label: 'Add Cards',
+            icon: Plus,
+            onPress: () => router.push(`/deck/${id}/cards/create`),
+          },
+          {
+            label: 'Manage Cards',
+            icon: ListChecks,
+            onPress: () => router.push(`/deck/${id}/cards`),
           },
         ]}
       />

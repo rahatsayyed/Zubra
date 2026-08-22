@@ -67,7 +67,14 @@ export default function EditDeckScreen() {
 
   return (
     <View className="flex-1 justify-end bg-black/60">
-      <Stack.Screen options={{ headerShown: false, presentation: 'transparentModal' }} />
+      <Stack.Screen
+        options={{
+          headerShown: false,
+          presentation: 'transparentModal',
+          contentStyle: { backgroundColor: 'transparent' },
+          animation: 'fade',
+        }}
+      />
       <Pressable className="flex-1" onPress={() => router.back()} />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <View className="gap-8 rounded-t-3xl bg-white px-4 pb-10 pt-6">
