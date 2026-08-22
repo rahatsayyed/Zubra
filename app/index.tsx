@@ -233,7 +233,7 @@ export default function HomeScreen() {
           </View>
           {isSearching ? (
             <View className="flex-row items-center gap-3">
-              <View className="flex-1 flex-row items-center gap-2 rounded-full bg-white/60 px-4 py-2.5">
+              <View className="flex-1 flex-row items-center gap-2 rounded-full bg-white/60 px-4 py-1.5">
                 <Iconify icon="proicons:search" size={16} color="#555" />
                 <TextInput
                   ref={searchInputRef}
@@ -251,9 +251,9 @@ export default function HomeScreen() {
                   </Pressable>
                 )}
               </View>
-              <Pressable onPress={closeSearch}>
+              {/* <Pressable onPress={closeSearch}>
                 <Text className="text-sm font-medium text-[#111111]">Cancel</Text>
-              </Pressable>
+              </Pressable> */}
             </View>
           ) : (
             <View className='h-96 flex-col justify-between'>
@@ -296,7 +296,7 @@ export default function HomeScreen() {
                 No decks match "{searchQuery}"
               </Text>
             ) : (
-              <View className="gap-[3px]">
+              <View className="gap-[4px] px-2">
                 {filteredDecks.map((deck, i) => (
                   <DeckCard
                     key={deck.id}
@@ -346,7 +346,7 @@ export default function HomeScreen() {
                   No decks yet — tap + to get started.
                 </Text>
               )}
-              <View className="gap-[3px] px-2">
+              <View className="gap-[4px] px-2">
                 {decks.map((deck, i) => (
                   <DeckCard
                     key={deck.id}
