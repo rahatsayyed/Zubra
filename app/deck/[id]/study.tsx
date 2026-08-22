@@ -120,7 +120,7 @@ export default function StudyScreen() {
               Session Complete
             </Text>
             <View className="flex-1 items-center justify-center">
-              <Illustration width={280} />
+              <Illustration width={280} circleColor="#FFE0FE" />
             </View>
             <View className="items-center gap-3 pb-8">
               <Text className="text-[80px] font-bold leading-none text-[#111111]">

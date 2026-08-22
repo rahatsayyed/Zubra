@@ -3,7 +3,15 @@ import Svg, { Circle, Path, Rect } from 'react-native-svg';
 
 // ─── Characters illustration (inline SVG, viewBox 767 × 469) ─────────────────
 // Shared between the Home screen and the Session Complete screen.
-export function Illustration({ width = 300 }: { width?: number }) {
+// circleColor: the first character's fill. Home/onboarding use green (#C2D6BD),
+// Session Complete uses pink (#FFE0FE).
+export function Illustration({
+  width = 300,
+  circleColor = '#C2D6BD',
+}: {
+  width?: number;
+  circleColor?: string;
+}) {
   const height = Math.round(width * (469 / 767));
   return (
     <Svg width={width} height={height} viewBox="0 0 767 469" fill="none">
@@ -27,7 +35,7 @@ export function Illustration({ width = 300 }: { width?: number }) {
         d="M284.043 0L308.694 127.068L409.256 45.5737L346.461 158.759L475.88 160.971L355.023 207.312L452.742 292.195L330.372 250.009L350.667 377.846L284.043 266.871L217.419 377.846L237.714 250.009L115.344 292.195L213.063 207.312L92.2057 160.971L221.624 158.759L158.83 45.5737L259.392 127.068L284.043 0Z"
         fill="#FF642B"
       />
-      <Circle cx="89.246" cy="300.345" r="89.246" fill="#C2D6BD" />
+      <Circle cx="89.246" cy="300.345" r="89.246" fill={circleColor} />
       <Rect x="63.5017" y="272.887" width="3.5826" height="3.43254" rx="1.71627" fill="#111111" />
       <Rect x="111.407" y="272.887" width="3.5826" height="3.43254" rx="1.71627" fill="#111111" />
       <Rect x="609.276" y="214.53" width="3.5826" height="3.43254" rx="1.71627" fill="#111111" />
