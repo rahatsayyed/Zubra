@@ -134,7 +134,7 @@ export default function CardListScreen() {
             </Pressable>
           </View>
           <View className="flex-row items-end justify-between">
-            <Text className="font-andada-bold text-[32px] leading-tight text-[#111111]">Cards</Text>
+            <Text className="font-andada text-[32px] leading-tight text-[#111111]">Cards</Text>
             <Text className="text-base text-[#111111]">{cards.length} cards</Text>
           </View>
         </View>

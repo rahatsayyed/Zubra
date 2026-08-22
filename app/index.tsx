@@ -67,7 +67,7 @@ function DeckCard({
         <Text className="text-sm text-neutral-500">{deck.cards} cards</Text>
         <ArrowUpRightIcon size={18} color="#111111" />
       </View>
-      <Text className="font-andada-bold text-[30px] -tracking-wide text-[#111111]" numberOfLines={1}>
+      <Text className="font-andada text-[30px] tracking-tighter text-[#111111]" numberOfLines={1}>
         {deck.title}
       </Text>
     </Pressable>
@@ -279,7 +279,7 @@ export default function HomeScreen() {
                 </Pressable>
               </View>
               <View className='flex-col gap-10'>
-                <Text className="font-andada-bold text-5xl leading-tight -tracking-wide text-[#111111]">
+                <Text className="font-andada text-5xl -tracking-wide text-[#111111]">
                   {'Words of\nthe day'}
                 </Text>
                 <View className="w-full">
@@ -327,7 +327,7 @@ export default function HomeScreen() {
             <View className="px-2 pt-2">
               <View className="gap-4 rounded-2xl bg-starter-card p-5">
                 <View className="flex-row items-baseline justify-between">
-                  <Text className="font-andada-bold text-xl text-[#111111]">
+                  <Text className="font-andada text-xl text-[#111111] w-5/6">
                     {featuredDeck ? featuredDeck.title : 'Starter Deck'}
                   </Text>
                   <Text className="text-sm text-neutral-500">
@@ -342,13 +342,13 @@ export default function HomeScreen() {
                   onPress={() =>
                     featuredDeck ? router.push(`/deck/${featuredDeck.id}`) : undefined
                   }>
-                  <Text className="text-base font-semibold text-[#111111]">Start Practising</Text>
+                  <Text className="text-base text-[#111111]">Start Practising</Text>
                 </Pressable>
               </View>
             </View>
 
             <View className="gap-3 pt-6">
-              <Text className="px-5 text-[11px] font-semibold tracking-widest text-neutral-400">
+              <Text className="px-5 text-[11px] font-medium tracking-widest text-neutral-400">
                 YOUR DECKS
               </Text>
               {decks.length === 0 && (

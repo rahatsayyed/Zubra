@@ -36,7 +36,7 @@ export default function OnboardingFluencyScreen() {
       </View>
 
       <View className="px-4 pb-6 pt-4">
-        <Text className="font-andada-bold text-[36px] leading-tight text-[#111111]">
+        <Text className="font-andada text-[36px] leading-tight text-[#111111]">
           What's your {language} proficiency?
         </Text>
       </View>

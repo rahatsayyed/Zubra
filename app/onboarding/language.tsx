@@ -24,7 +24,7 @@ export default function OnboardingLanguageScreen() {
       </View>
 
       <View className="px-4 pb-6 pt-4">
-        <Text className="font-andada-bold text-[36px] leading-tight text-[#111111]">
+        <Text className="font-andada text-[36px] leading-tight text-[#111111]">
           Let's start with choosing your language?
         </Text>
       </View>

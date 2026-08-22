@@ -52,7 +52,7 @@ export default function SelectDeckScreen() {
         </View>
       </View>
 
-      <Text className="px-4 pb-4 pt-6 text-lg font-semibold text-[#111111]">Add to deck</Text>
+      <Text className="px-4 pb-4 pt-6 text-lg text-[#111111]">Add to deck</Text>
 
       <ScrollView className="flex-1 px-4" contentContainerStyle={{ gap: 8 }}>
         {filtered.map((deck) => (

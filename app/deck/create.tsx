@@ -46,7 +46,7 @@ export default function CreateDeckScreen() {
               onChangeText={setTitle}
               placeholder="Name of the deck"
               placeholderTextColor="#CCB4D1"
-              className="flex-1 font-andada-bold text-[32px] leading-tight text-[#111111]"
+              className="flex-1 font-andada text-[32px] leading-tight text-[#111111]"
               autoFocus
             />
           </View>

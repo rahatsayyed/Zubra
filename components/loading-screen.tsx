@@ -46,7 +46,7 @@ export function LoadingScreen() {
       <Animated.View style={{ transform: [{ scale: pulse }] }}>
         <ZebraLogo size={140} />
       </Animated.View>
-      <Text className="font-andada-bold text-3xl tracking-widest text-[#111111]">
+      <Text className="font-andada text-3xl tracking-widest text-[#111111]">
         Zubra
       </Text>
     </View>

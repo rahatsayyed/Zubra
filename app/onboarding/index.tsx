@@ -14,7 +14,7 @@ export default function OnboardingIntroScreen() {
       <Stack.Screen options={{ headerShown: false }} />
 
       <View className="flex-1 px-4" style={{ paddingTop: insets.top + 40 }}>
-        <Text className="font-andada-bold text-[44px] leading-none text-[#111111]">
+        <Text className="font-andada text-[44px] leading-none text-[#111111]">
           Build your language, one card at a time.
         </Text>
       </View>

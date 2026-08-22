@@ -20,7 +20,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<typeof View>) {
   return (
     <TextClassContext.Provider
       value={cn(
-        'text-xl font-semibold leading-none tracking-tight text-card-foreground',
+        'text-xl leading-none tracking-tight text-card-foreground',
         className
       )}>
       <View {...props} />

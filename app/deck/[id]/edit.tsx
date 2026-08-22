@@ -94,7 +94,7 @@ export default function EditDeckScreen() {
               onChangeText={setTitle}
               placeholder="Name of the deck"
               placeholderTextColor="#CCB4D1"
-              className="font-andada-bold text-[32px] leading-tight text-[#111111]"
+              className="font-andada text-[32px] leading-tight text-[#111111]"
             />
             <TextInput
               value={description}
