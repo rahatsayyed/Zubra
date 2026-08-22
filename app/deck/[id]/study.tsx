@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Animated, TouchableOpacity } from 'react-native';
+import { View, Pressable } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import { Card as CardContainer, CardContent } from '@/components/ui/card';
-import { Icon } from '@/components/ui/icon';
-import { X, Trophy, CheckCircle2 } from 'lucide-react-native';
+import { Illustration } from '@/components/illustration';
+import { ChevronLeft, RefreshCw, CheckCircle2 } from 'lucide-react-native';
 import {
   getDueCards,
   getCardsByDifficultyBand,
@@ -14,6 +12,16 @@ import {
   Card,
 } from '@/lib/data/api';
 import { Rating } from 'ts-fsrs';
+import { getDeckColorClass } from '@/lib/utils';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+// Full literal class names so NativeWind can find them at build time.
+const RATING_OPTIONS = [
+  { rating: Rating.Again, label: 'AGAIN', time: '< 1 min', bg: 'bg-rating-again' },
+  { rating: Rating.Hard, label: 'HARD', time: '< 5 min', bg: 'bg-rating-hard' },
+  { rating: Rating.Good, label: 'GOOD', time: '< 10 min', bg: 'bg-rating-good' },
+  { rating: Rating.Easy, label: 'EASY', time: '4 d', bg: 'bg-rating-easy' },
+] as const;
 
 export default function StudyScreen() {
   const { id, mode, band, limit } = useLocalSearchParams<{
@@ -23,6 +31,8 @@ export default function StudyScreen() {
     limit?: string;
   }>();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const bgClass = getDeckColorClass(id);
 
   const [cards, setCards] = useState<Card[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -61,7 +71,6 @@ export default function StudyScreen() {
     try {
       await updateCardAfterReview(currentCard.id, id, rating);
 
-      // Update session metrics
       setSessionStats((prev) => ({
         ...prev,
         reviewed: prev.reviewed + 1,
@@ -71,7 +80,6 @@ export default function StudyScreen() {
         easy: rating === Rating.Easy ? prev.easy + 1 : prev.easy,
       }));
 
-      // Move to next card or finish
       if (currentIndex + 1 < cards.length) {
         setCurrentIndex(currentIndex + 1);
         setShowAnswer(false);
@@ -84,140 +92,133 @@ export default function StudyScreen() {
   };
 
   const currentCard = cards[currentIndex];
+  const progress = cards.length > 0 ? (currentIndex / cards.length) * 100 : 0;
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          headerShown: false,
-          presentation: 'fullScreenModal',
-        }}
-      />
-
-      <View className="flex-1 bg-background pt-14">
-        {/* Session Header */}
-        <View className="flex-row items-center justify-between border-b border-border px-6 pb-4">
-          <View>
-            <Text className="text-sm font-semibold text-muted-foreground">
-              {mode === 'custom' ? 'CUSTOM SESSION' : 'DUE TODAY'}
-            </Text>
-            {!isFinished && !loading && (
-              <Text className="text-xl font-bold text-foreground">
-                {cards.length - currentIndex}{' '}
-                <Text className="text-lg font-medium text-muted-foreground">cards left</Text>
-              </Text>
-            )}
-          </View>
-          <Button
-            variant="ghost"
-            size="icon"
-            onPress={() => setIsFinished(true)}
-            className="rounded-full bg-secondary/50">
-            <Icon as={X} className="size-6 text-foreground" />
-          </Button>
-        </View>
-
+      <Stack.Screen options={{ headerShown: false, presentation: 'fullScreenModal' }} />
+      <View className={`flex-1 ${bgClass}`} style={{ paddingTop: insets.top + 24 }}>
         {loading ? (
           <View className="flex-1 items-center justify-center">
-            <Text className="text-muted-foreground">Preparing your session...</Text>
+            <Text className="text-[#111111]">Preparing your session…</Text>
           </View>
-        ) : isFinished || cards.length === 0 ? (
+        ) : cards.length === 0 ? (
           <View className="flex-1 items-center justify-center gap-6 p-6">
-            <Icon
-              as={cards.length === 0 ? CheckCircle2 : Trophy}
-              className="size-24 text-primary"
-            />
-            <Text className="text-center text-3xl font-bold text-foreground">
-              {cards.length === 0 ? "You're all caught up!" : 'Session Complete'}
+            <CheckCircle2 size={72} color="#111111" strokeWidth={1.2} />
+            <Text className="text-center text-3xl font-bold text-[#111111]">
+              You're all caught up!
             </Text>
-
-            <CardContainer className="mt-4 w-full bg-secondary/30">
-              <CardContent className="items-center gap-4 p-6">
-                <Text className="text-4xl font-black text-foreground">{sessionStats.reviewed}</Text>
-                <Text className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                  Cards Reviewed Today
-                </Text>
-              </CardContent>
-            </CardContainer>
-
-            <Button className="mt-8 h-auto w-full py-2 shadow-sm" onPress={() => router.back()}>
-              <Text className="text-lg text-primary-foreground">Return to Deck</Text>
-            </Button>
+            <Pressable
+              className="mt-8 w-full items-center rounded-full border-[1.5px] border-[#111111] bg-brand py-4 active:opacity-80"
+              onPress={() => router.back()}>
+              <Text className="text-base font-medium text-[#111111]">Return to Deck</Text>
+            </Pressable>
+          </View>
+        ) : isFinished ? (
+          <View className="flex-1 bg-hero px-6 pb-8">
+            <Text className="pt-4 text-center text-[32px] font-bold leading-tight text-[#111111]">
+              Session Complete
+            </Text>
+            <View className="flex-1 items-center justify-center">
+              <Illustration width={280} />
+            </View>
+            <View className="items-center gap-3 pb-8">
+              <Text className="text-[80px] font-bold leading-none text-[#111111]">
+                {sessionStats.reviewed}
+              </Text>
+              <Text className="text-sm font-medium tracking-[3px] text-[#111111]">
+                CARDS REVIEWED TODAY
+              </Text>
+            </View>
+            <Pressable
+              className="w-full items-center rounded-full border-[1.5px] border-[#111111] bg-brand py-4 active:opacity-80"
+              onPress={() => router.back()}>
+              <Text className="text-base font-medium text-[#111111]">Return to Deck</Text>
+            </Pressable>
           </View>
         ) : (
-          <View className="flex-1 justify-between gap-6 p-6 pb-12">
-            {/* Flashcard Area */}
-            <ScrollView
-              className="flex-1"
-              contentContainerClassName="flex-grow justify-center py-8">
-              <Text className="px-4 text-center text-3xl font-bold leading-tight text-foreground">
-                {currentCard?.question}
-              </Text>
-
-              {showAnswer && (
-                <View className="mt-8 items-center border-t border-border/50 pt-8">
-                  <Text className="px-4 text-center text-2xl font-medium text-foreground/90">
-                    {currentCard?.answer}
+          <View className="flex-1 px-4 pb-6">
+            {/* Header */}
+            <View className="gap-4">
+              <View className="flex-row items-center justify-between">
+                <Pressable hitSlop={12} onPress={() => router.back()}>
+                  <ChevronLeft size={24} color="#111111" strokeWidth={1.5} />
+                </Pressable>
+                <Pressable
+                  hitSlop={8}
+                  className="h-11 w-11 items-center justify-center rounded-full border-[1.5px] border-[#111111] bg-white/70"
+                  onPress={() => setShowAnswer((v) => !v)}>
+                  <RefreshCw size={16} color="#111111" strokeWidth={1.5} />
+                </Pressable>
+              </View>
+              <View className="gap-3">
+                <View className="flex-row items-end justify-between">
+                  <Text className="text-[28px] font-bold leading-tight text-[#111111]">
+                    Card {currentIndex + 1}
+                  </Text>
+                  <Text className="text-sm text-[#717171]">
+                    {currentIndex + 1}/{cards.length} cards
                   </Text>
                 </View>
-              )}
-            </ScrollView>
-
-            {/* Interaction Area */}
-            <View>
-              {!showAnswer ? (
-                <Button
-                  className="w-full shadow-sm transition-transform active:scale-[98%]"
-                  onPress={() => setShowAnswer(true)}>
-                  <Text className="text-primary-foreground">Show Answer</Text>
-                </Button>
-              ) : (
-                <View className="flex-row gap-2">
-                  <Button
-                    variant="outline"
-                    className="h-auto flex-1 border-destructive/30 bg-destructive/10 py-1 active:bg-destructive/20"
-                    onPress={() => handleRate(Rating.Again)}>
-                    <View className="items-center">
-                      <Text className="mb-0.5 font-bold text-destructive">Again</Text>
-                      <Text className="text-[10px] font-medium tracking-wider text-destructive/70">
-                        &lt; 1m
-                      </Text>
-                    </View>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="h-auto flex-1 py-1 active:bg-secondary"
-                    onPress={() => handleRate(Rating.Hard)}>
-                    <View className="items-center">
-                      <Text className="mb-0.5 font-bold text-foreground">Hard</Text>
-                      <Text className="text-[10px] font-medium tracking-wider text-muted-foreground">
-                        &lt; 5m
-                      </Text>
-                    </View>
-                  </Button>
-                  <Button
-                    className="h-auto flex-1 bg-green-500 py-1 hover:bg-green-600 active:bg-green-700"
-                    onPress={() => handleRate(Rating.Good)}>
-                    <View className="items-center">
-                      <Text className="mb-0.5 font-bold text-white">Good</Text>
-                      <Text className="text-[10px] font-medium tracking-wider text-green-100">
-                        &lt; 10m
-                      </Text>
-                    </View>
-                  </Button>
-                  <Button
-                    className="h-auto flex-1 bg-blue-500 py-1 hover:bg-blue-600 active:bg-blue-700"
-                    onPress={() => handleRate(Rating.Easy)}>
-                    <View className="items-center">
-                      <Text className="mb-0.5 font-bold text-white">Easy</Text>
-                      <Text className="text-[10px] font-medium tracking-wider text-blue-100">
-                        4d
-                      </Text>
-                    </View>
-                  </Button>
+                <View className="h-[10px] w-full rounded-full border-[1.5px] border-[#111111] bg-white p-[1px]">
+                  <View
+                    className="h-full rounded-full bg-brand"
+                    style={{ width: `${Math.max(progress, 4)}%` }}
+                  />
                 </View>
-              )}
+              </View>
             </View>
+
+            {/* Card stack */}
+            <View className="flex-1 items-center justify-center">
+              <View className="relative w-full max-w-[350px] self-center" style={{ height: 420 }}>
+                <View
+                  className="absolute left-2 right-2 top-4 rounded-xl bg-black/5"
+                  style={{ bottom: -16 }}
+                />
+                <View
+                  className="absolute left-1 right-1 top-2 rounded-xl bg-black/10"
+                  style={{ bottom: -8 }}
+                />
+                <View className="absolute inset-0 items-center justify-center gap-6 rounded-xl bg-white p-6">
+                  <Text className="text-center text-4xl text-[#111111]">
+                    {currentCard?.question}
+                  </Text>
+                  {showAnswer && (
+                    <>
+                      <View className="h-px w-12 bg-[#111111]/30" />
+                      <Text className="text-center text-2xl text-[#111111]">
+                        {currentCard?.answer}
+                      </Text>
+                    </>
+                  )}
+                  {!showAnswer && (
+                    <Pressable
+                      className="absolute bottom-6 items-center active:opacity-70"
+                      onPress={() => setShowAnswer(true)}>
+                      <Text className="text-base text-[#9B9B9B]">Show Answer</Text>
+                    </Pressable>
+                  )}
+                </View>
+              </View>
+            </View>
+
+            {/* Rating row */}
+            {showAnswer && (
+              <View className="flex-row gap-2">
+                {RATING_OPTIONS.map((opt) => (
+                  <Pressable
+                    key={opt.label}
+                    className={`flex-1 items-center justify-center gap-0.5 rounded-xl py-4 active:opacity-70 ${opt.bg}`}
+                    onPress={() => handleRate(opt.rating)}>
+                    <Text className="text-xs font-medium tracking-widest text-[#111111]">
+                      {opt.label}
+                    </Text>
+                    <Text className="text-[10px] text-[#111111]/70">{opt.time}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            )}
           </View>
         )}
       </View>
