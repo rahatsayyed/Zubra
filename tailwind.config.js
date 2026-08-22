@@ -57,6 +57,21 @@ module.exports = {
           foreground: 'hsl(var(--card-foreground))',
         },
       },
+      fontFamily: {
+        // ── Andada Pro — used for large serif headlines ────
+        andada: ['AndadaPro_400Regular'],
+        'andada-medium': ['AndadaPro_500Medium'],
+        'andada-semibold': ['AndadaPro_600SemiBold'],
+        'andada-bold': ['AndadaPro_700Bold'],
+        // ── Instrument Sans — used for body text / labels ──
+        'instrument-sans': ['InstrumentSans_400Regular'],
+        'instrument-sans-medium': ['InstrumentSans_500Medium'],
+        'instrument-sans-semibold': ['InstrumentSans_600SemiBold'],
+        'instrument-sans-bold': ['InstrumentSans_700Bold'],
+        // ── Amiri — used for Arabic script text ────────────
+        amiri: ['Amiri_400Regular'],
+        'amiri-bold': ['Amiri_700Bold'],
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',

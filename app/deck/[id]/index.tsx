@@ -68,7 +68,7 @@ export default function DeckDetailScreen() {
             <MoreHorizontal size={16} color="#111111" strokeWidth={1.5} />
           </Pressable>
         </View>
-        <Text className="text-[32px] font-bold leading-tight text-[#111111]">{deck.title}</Text>
+        <Text className="font-andada-bold text-[32px] leading-tight text-[#111111]">{deck.title}</Text>
       </View>
 
       <View className="gap-8 rounded-xl bg-black/5 p-4 mx-4 mt-8">
@@ -172,7 +172,7 @@ export default function DeckDetailScreen() {
                   </Pressable>
                 ))}
                 <TextInput
-                  className={`min-w-[90px] rounded-full border-[1.5px] border-[#111111] px-5 py-3 text-center text-base text-[#111111] ${customLimitText !== '' ? 'bg-brand' : ''}`}
+                  className={`min-w-[90px] rounded-full border-[1.5px] border-[#111111] px-5 py-3 text-center font-instrument-sans text-base text-[#111111] ${customLimitText !== '' ? 'bg-brand' : ''}`}
                   placeholder="Custom"
                   placeholderTextColor="#7D7D7D"
                   keyboardType="number-pad"

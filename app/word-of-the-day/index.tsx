@@ -91,8 +91,10 @@ export default function WordOfTheDayScreen() {
         {/* Big swipe/tap region — covers everything below, icons sit on top of it */}
         <View className="absolute inset-0" {...panResponder.panHandlers} />
 
-        <View className="flex-1 items-center justify-center gap-3" pointerEvents="none">
-          <Text className="text-[66px] leading-tight text-[#111111]">{word.arabic}</Text>
+        <View className="flex-1 items-center mt-[70%] gap-0" pointerEvents="none">
+          <Text className="font-amiri text-[66px] leading-tight text-[#111111]">
+            {word.arabic}
+          </Text>
           <View className="flex-row items-center gap-2">
             <Text className="text-2xl text-[#111111]">{word.transliteration}</Text>
             <View className="h-1 w-1 rounded-full bg-[#111111]" />
@@ -101,20 +103,20 @@ export default function WordOfTheDayScreen() {
         </View>
 
         <View
-          className="absolute bottom-0 left-0 right-0 flex-row items-center justify-center gap-11"
+          className="absolute bottom-20 left-0 right-0 flex-row items-center justify-center gap-6"
           style={{ paddingBottom: insets.bottom + 24 }}>
           <Pressable hitSlop={12} onPress={handleShare}>
-            <Iconify icon="famicons:share-outline" size={28} color="#111111" />
+            <Iconify icon="famicons:share-outline" size={24} color="#111111" />
           </Pressable>
           <Pressable hitSlop={12} onPress={toggleSaved}>
             <Iconify
               icon={isSaved ? 'mage:bookmark-fill' : 'mage:bookmark'}
-              size={28}
+              size={24}
               color="#111111"
             />
           </Pressable>
           <Pressable hitSlop={12} onPress={handleAdd}>
-            <Iconify icon="solar:add-square-linear" size={28} color="#111111" />
+            <Iconify icon="solar:add-square-linear" size={24} color="#111111" />
           </Pressable>
         </View>
       </View>

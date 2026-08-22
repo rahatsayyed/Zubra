@@ -94,7 +94,7 @@ export default function EditDeckScreen() {
               onChangeText={setTitle}
               placeholder="Name of the deck"
               placeholderTextColor="#CCB4D1"
-              className="text-[32px] font-bold leading-tight text-[#111111]"
+              className="font-andada-bold text-[32px] leading-tight text-[#111111]"
             />
             <TextInput
               value={description}
@@ -104,7 +104,7 @@ export default function EditDeckScreen() {
               multiline
               numberOfLines={4}
               textAlignVertical="top"
-              className="h-[100px] rounded-xl border-[1.5px] border-[#111111] px-4 py-3 text-base text-[#111111]"
+              className="h-[100px] rounded-xl border-[1.5px] border-[#111111] px-4 py-3 font-instrument-sans text-base text-[#111111]"
             />
           </View>
 

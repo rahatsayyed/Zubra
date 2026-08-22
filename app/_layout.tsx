@@ -9,6 +9,20 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import { useEffect, useState } from 'react';
+import { useFonts } from 'expo-font';
+import {
+  AndadaPro_400Regular,
+  AndadaPro_500Medium,
+  AndadaPro_600SemiBold,
+  AndadaPro_700Bold,
+} from '@expo-google-fonts/andada-pro';
+import {
+  InstrumentSans_400Regular,
+  InstrumentSans_500Medium,
+  InstrumentSans_600SemiBold,
+  InstrumentSans_700Bold,
+} from '@expo-google-fonts/instrument-sans';
+import { Amiri_400Regular, Amiri_700Bold } from '@expo-google-fonts/amiri';
 import { initDatabase } from '@/lib/data/database';
 
 
@@ -20,6 +34,18 @@ export {
 export default function RootLayout() {
   const { colorScheme } = useColorScheme();
   const [isDbReady, setIsDbReady] = useState(false);
+  const [fontsLoaded] = useFonts({
+    AndadaPro_400Regular,
+    AndadaPro_500Medium,
+    AndadaPro_600SemiBold,
+    AndadaPro_700Bold,
+    InstrumentSans_400Regular,
+    InstrumentSans_500Medium,
+    InstrumentSans_600SemiBold,
+    InstrumentSans_700Bold,
+    Amiri_400Regular,
+    Amiri_700Bold,
+  });
 
   useEffect(() => {
     const setupDatabase = async () => {
@@ -34,7 +60,7 @@ export default function RootLayout() {
     setupDatabase();
   }, []);
 
-  if (!isDbReady) {
+  if (!isDbReady || !fontsLoaded) {
     return <LoadingScreen />;
   }
 

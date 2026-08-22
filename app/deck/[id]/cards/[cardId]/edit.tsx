@@ -72,14 +72,14 @@ export default function EditCardScreen() {
               onChangeText={setQuestion}
               placeholder="Front (Question)"
               placeholderTextColor="#7D7D7D"
-              className="rounded-full border-[1.5px] border-[#111111] px-6 py-4 text-base text-[#111111]"
+              className="rounded-full border-[1.5px] border-[#111111] px-6 py-4 font-instrument-sans text-base text-[#111111]"
             />
             <TextInput
               value={answer}
               onChangeText={setAnswer}
               placeholder="Back (Answer)"
               placeholderTextColor="#7D7D7D"
-              className="rounded-full border-[1.5px] border-[#111111] px-6 py-4 text-base text-[#111111]"
+              className="rounded-full border-[1.5px] border-[#111111] px-6 py-4 font-instrument-sans text-base text-[#111111]"
             />
           </View>
 

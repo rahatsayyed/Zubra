@@ -46,7 +46,7 @@ export default function SelectDeckScreen() {
             onChangeText={setQuery}
             placeholder="Search decks…"
             placeholderTextColor="#888"
-            className="flex-1 text-sm text-[#111111]"
+            className="flex-1 font-instrument-sans text-sm text-[#111111]"
             autoFocus
           />
         </View>

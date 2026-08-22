@@ -67,7 +67,7 @@ function SwipeableCardRow({
         {...panResponder.panHandlers}
         style={{ transform: [{ translateX }] }}
         className="min-h-[110px] justify-between rounded-xl bg-deck-4 p-4">
-        <Text className="text-2xl text-[#111111]" numberOfLines={2}>
+        <Text className="font-amiri text-2xl text-[#111111]" numberOfLines={2}>
           {card.question}
         </Text>
         <Text className="text-base text-[#111111]" numberOfLines={1}>
@@ -134,7 +134,7 @@ export default function CardListScreen() {
             </Pressable>
           </View>
           <View className="flex-row items-end justify-between">
-            <Text className="text-[32px] font-bold leading-tight text-[#111111]">Cards</Text>
+            <Text className="font-andada-bold text-[32px] leading-tight text-[#111111]">Cards</Text>
             <Text className="text-base text-[#111111]">{cards.length} cards</Text>
           </View>
         </View>

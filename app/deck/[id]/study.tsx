@@ -105,7 +105,7 @@ export default function StudyScreen() {
         ) : cards.length === 0 ? (
           <View className="flex-1 items-center justify-center gap-6 p-6">
             <CheckCircle2 size={72} color="#111111" strokeWidth={1.2} />
-            <Text className="text-center text-3xl font-bold text-[#111111]">
+            <Text className="font-andada-bold text-center text-3xl text-[#111111]">
               You're all caught up!
             </Text>
             <Pressable
@@ -116,14 +116,14 @@ export default function StudyScreen() {
           </View>
         ) : isFinished ? (
           <View className="flex-1 bg-hero px-6 pb-8">
-            <Text className="pt-4 text-center text-[32px] font-bold leading-tight text-[#111111]">
+            <Text className="pt-4 text-center font-andada-bold text-[32px] leading-tight text-[#111111]">
               Session Complete
             </Text>
             <View className="flex-1 items-center justify-center">
               <Illustration width={280} circleColor="#FFE0FE" />
             </View>
             <View className="items-center gap-3 pb-8">
-              <Text className="text-[80px] font-bold leading-none text-[#111111]">
+              <Text className="font-andada-bold text-[80px] leading-none text-[#111111]">
                 {sessionStats.reviewed}
               </Text>
               <Text className="text-sm font-medium tracking-[3px] text-[#111111]">
@@ -153,7 +153,7 @@ export default function StudyScreen() {
               </View>
               <View className="gap-3">
                 <View className="flex-row items-end justify-between">
-                  <Text className="text-[28px] font-bold leading-tight text-[#111111]">
+                  <Text className="font-andada-bold text-[28px] leading-tight text-[#111111]">
                     Card {currentIndex + 1}
                   </Text>
                   <Text className="text-sm text-[#717171]">
@@ -184,7 +184,7 @@ export default function StudyScreen() {
                   <View
                     className="flex-1 items-center justify-center gap-6 p-6"
                     style={{ paddingBottom: showAnswer ? 110 : 60 }}>
-                    <Text className="text-center text-4xl text-[#111111]">
+                    <Text className="font-amiri text-center text-4xl text-[#111111]">
                       {currentCard?.question}
                     </Text>
                     {showAnswer && (
