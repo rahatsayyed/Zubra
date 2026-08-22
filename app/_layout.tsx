@@ -9,6 +9,8 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import { useEffect, useState } from 'react';
+import { Platform } from 'react-native';
+import * as NavigationBar from 'expo-navigation-bar';
 import { useFonts } from 'expo-font';
 import {
   AndadaPro_400Regular,
@@ -46,6 +48,13 @@ export default function RootLayout() {
     Amiri_400Regular,
     Amiri_700Bold,
   });
+
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      NavigationBar.setPositionAsync('absolute');
+      NavigationBar.setBackgroundColorAsync('#00000000');
+    }
+  }, []);
 
   useEffect(() => {
     const setupDatabase = async () => {
