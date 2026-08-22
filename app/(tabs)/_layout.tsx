@@ -13,7 +13,7 @@ function TabsLayoutInner() {
   const insets = useSafeAreaInsets();
   const [showCreateSheet, setShowCreateSheet] = React.useState(false);
   const notify = useDecksRefreshNotify();
-  const navBottom = insets.bottom + 12;
+  const navBottom = insets.bottom;
 
   return (
     <NavbarScrollProvider>

@@ -53,8 +53,10 @@ export default function EditCardScreen() {
           animation: 'fade',
         }}
       />
-      <Pressable className="flex-1" onPress={() => router.back()} />
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        className="flex-1 justify-end">
+        <Pressable className="flex-1" onPress={() => router.back()} />
         <View className="gap-8 rounded-t-3xl bg-white px-4 pb-10 pt-6">
           <View className="flex-row items-center justify-center">
             <Pressable

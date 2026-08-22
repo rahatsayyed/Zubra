@@ -29,7 +29,7 @@ export default function CreateDeckScreen() {
     <View className="flex-1 bg-create-bg">
       <Stack.Screen options={{ headerShown: false }} />
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1">
         <View className="flex-1 gap-8 px-4" style={{ paddingTop: insets.top + 24 }}>
           <Pressable

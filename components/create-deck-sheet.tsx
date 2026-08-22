@@ -80,9 +80,7 @@ export function CreateDeckSheet({ visible, onClose, onImported }: CreateDeckShee
           <Animated.View
             className="absolute bottom-0 left-0 right-0"
             style={{ transform: [{ translateY: sheetY }] }}>
-            <View
-              className="rounded-t-3xl bg-white px-6 pb-12 pt-6"
-              onStartShouldSetResponder={() => true}>
+            <View className="rounded-t-3xl bg-white px-6 pb-12 pt-6">
               <View className="mb-8 flex-row items-center">
                 <Pressable hitSlop={12} className="h-8 w-8 items-center justify-center" onPress={close}>
                   <Iconify icon="fluent:dismiss-20-filled" size={20} color="#111111" />
