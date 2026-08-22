@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, TextInput, Alert, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
 import { Text } from '@/components/ui/text';
-import { X } from 'lucide-react-native';
+import { Iconify } from 'react-native-iconify';
 import { createCard } from '@/lib/data/api';
 
 export default function CreateCardScreen() {
@@ -43,7 +43,7 @@ export default function CreateCardScreen() {
               hitSlop={12}
               className="absolute left-0 h-6 w-6 items-center justify-center"
               onPress={() => router.back()}>
-              <X size={20} color="#111111" strokeWidth={1.5} />
+              <Iconify icon="fluent:dismiss-20-filled" size={20} color="#111111" />
             </Pressable>
             <Text className="text-lg text-[#111111]">Add Card</Text>
           </View>

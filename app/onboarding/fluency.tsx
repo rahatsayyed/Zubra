@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Pressable, ScrollView } from 'react-native';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
 import { Text } from '@/components/ui/text';
-import { ChevronLeft } from 'lucide-react-native';
+import { Iconify } from 'react-native-iconify';
 import { completeOnboarding } from '@/lib/data/api';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -30,7 +30,7 @@ export default function OnboardingFluencyScreen() {
 
       <View className="flex-row items-center justify-between px-4" style={{ paddingTop: insets.top + 24 }}>
         <Pressable hitSlop={12} onPress={() => router.back()}>
-          <ChevronLeft size={24} color="#111111" strokeWidth={1.5} />
+          <Iconify icon="mynaui:chevron-left" size={24} color="#111111" />
         </Pressable>
         <Text className="text-sm text-[#111111]">2/2</Text>
       </View>

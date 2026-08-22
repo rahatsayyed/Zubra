@@ -3,7 +3,7 @@ import { View, Modal, Pressable, TextInput } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { Text } from '@/components/ui/text';
 import { OptionSheet } from '@/components/option-sheet';
-import { ChevronLeft, MoreHorizontal, ListChecks, Pencil, Plus, X } from 'lucide-react-native';
+import { Iconify } from 'react-native-iconify';
 import { getDeck, getDeckMastery, Deck, DifficultyBand } from '@/lib/data/api';
 import { getDeckColorClass } from '@/lib/utils';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -60,12 +60,12 @@ export default function DeckDetailScreen() {
       <View className="gap-4 px-4">
         <View className="flex-row items-start justify-between">
           <Pressable hitSlop={12} onPress={() => router.back()}>
-            <ChevronLeft size={24} color="#111111" strokeWidth={1.5} />
+            <Iconify icon="mynaui:chevron-left" size={24} color="#111111" />
           </Pressable>
           <Pressable
             className="h-11 w-11 items-center justify-center rounded-full border-[1.5px] border-[#111111] bg-white/70"
             onPress={() => setShowMenu(true)}>
-            <MoreHorizontal size={16} color="#111111" strokeWidth={1.5} />
+            <Iconify icon="ant-design:more-outlined" size={16} color="#111111" />
           </Pressable>
         </View>
         <Text className="font-andada text-[32px] leading-tight text-[#111111]">{deck.title}</Text>
@@ -105,17 +105,17 @@ export default function DeckDetailScreen() {
         options={[
           {
             label: 'Edit Deck',
-            icon: Pencil,
+            icon: 'material-symbols-light:edit-outline',
             onPress: () => router.push(`/deck/${id}/edit`),
           },
           {
             label: 'Add Cards',
-            icon: Plus,
+            icon: 'si:add-duotone',
             onPress: () => router.push(`/deck/${id}/cards/create`),
           },
           {
             label: 'Manage Cards',
-            icon: ListChecks,
+            icon: 'material-symbols-light:dashboard-2-edit-outline',
             onPress: () => router.push(`/deck/${id}/cards`),
           },
         ]}
@@ -134,7 +134,7 @@ export default function DeckDetailScreen() {
                 hitSlop={12}
                 className="absolute left-0 h-6 w-6 items-center justify-center"
                 onPress={() => setShowCustomModal(false)}>
-                <X size={20} color="#111111" strokeWidth={1.5} />
+                <Iconify icon="fluent:dismiss-20-filled" size={20} color="#111111" />
               </Pressable>
               <Text className="text-lg text-[#111111]">Custom Study</Text>
             </View>

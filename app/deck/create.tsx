@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, Alert, KeyboardAvoidingView, Platform, Pressable } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { ChevronLeft } from 'lucide-react-native';
+import { Iconify } from 'react-native-iconify';
 import { Text } from '@/components/ui/text';
 import { createDeck } from '@/lib/data/api';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -36,7 +36,7 @@ export default function CreateDeckScreen() {
             hitSlop={12}
             className="h-6 w-6 items-center justify-center"
             onPress={() => router.back()}>
-            <ChevronLeft size={24} color="#111111" strokeWidth={1.5} />
+            <Iconify icon="mynaui:chevron-left" size={24} color="#111111" />
           </Pressable>
 
           <View className="flex-row items-stretch gap-3">

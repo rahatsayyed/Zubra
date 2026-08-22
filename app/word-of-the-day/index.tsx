@@ -3,7 +3,6 @@ import { View, Pressable, Share, PanResponder, Dimensions } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { Text } from '@/components/ui/text';
 import { Iconify } from 'react-native-iconify';
-import { ChevronLeft } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Sample vocabulary — a placeholder until "word of the day" has a real content source.
@@ -80,7 +79,7 @@ export default function WordOfTheDayScreen() {
         className="flex-row items-center justify-between px-4"
         style={{ paddingTop: insets.top + 24 }}>
         <Pressable hitSlop={12} onPress={() => router.back()}>
-          <ChevronLeft size={24} color="#111111" strokeWidth={1.5} />
+          <Iconify icon="mynaui:chevron-left" size={24} color="#111111" />
         </Pressable>
         <Text className="text-base text-[#111111]">
           {index + 1}/{WORDS.length}

@@ -3,7 +3,8 @@ import { View, Pressable } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { Text } from '@/components/ui/text';
 import { Illustration } from '@/components/illustration';
-import { ChevronLeft, RefreshCw, CheckCircle2 } from 'lucide-react-native';
+import { Iconify } from 'react-native-iconify';
+import { FlipCardIcon } from '@/components/flip-card-icon';
 import {
   getDueCards,
   getCardsByDifficultyBand,
@@ -104,7 +105,7 @@ export default function StudyScreen() {
           </View>
         ) : cards.length === 0 ? (
           <View className="flex-1 items-center justify-center gap-6 p-6">
-            <CheckCircle2 size={72} color="#111111" strokeWidth={1.2} />
+            <Iconify icon="material-symbols-light:check-circle-outline" size={72} color="#111111" />
             <Text className="font-andada text-center text-3xl text-[#111111]">
               You're all caught up!
             </Text>
@@ -142,13 +143,13 @@ export default function StudyScreen() {
             <View className="gap-4">
               <View className="flex-row items-center justify-between">
                 <Pressable hitSlop={12} onPress={() => router.back()}>
-                  <ChevronLeft size={24} color="#111111" strokeWidth={1.5} />
+                  <Iconify icon="mynaui:chevron-left" size={24} color="#111111" />
                 </Pressable>
                 <Pressable
                   hitSlop={8}
                   className="h-11 w-11 items-center justify-center rounded-full border-[1.5px] border-[#111111] bg-white/70"
                   onPress={() => setShowAnswer((v) => !v)}>
-                  <RefreshCw size={16} color="#111111" strokeWidth={1.5} />
+                  <FlipCardIcon size={18} color="#111111" />
                 </Pressable>
               </View>
               <View className="gap-3">

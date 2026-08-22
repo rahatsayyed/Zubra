@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, TextInput, Alert, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { Text } from '@/components/ui/text';
-import { X } from 'lucide-react-native';
+import { Iconify } from 'react-native-iconify';
 import { getDeck, updateDeck, deleteDeck } from '@/lib/data/api';
 
 export default function EditDeckScreen() {
@@ -83,7 +83,7 @@ export default function EditDeckScreen() {
               hitSlop={12}
               className="absolute left-0 h-6 w-6 items-center justify-center"
               onPress={() => router.back()}>
-              <X size={20} color="#111111" strokeWidth={1.5} />
+              <Iconify icon="fluent:dismiss-20-filled" size={20} color="#111111" />
             </Pressable>
             <Text className="text-lg text-[#111111]">Edit deck</Text>
           </View>

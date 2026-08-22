@@ -1,12 +1,11 @@
 import * as React from 'react';
 import { Modal, Pressable, View } from 'react-native';
 import { Text } from '@/components/ui/text';
-import { Icon } from '@/components/ui/icon';
-import type { LucideIcon } from 'lucide-react-native';
+import { Iconify } from 'react-native-iconify';
 
 export interface OptionSheetItem {
   label: string;
-  icon: LucideIcon;
+  icon: string;
   onPress: () => void;
   destructive?: boolean;
 }
@@ -33,11 +32,7 @@ export function OptionSheet({ visible, onClose, options }: OptionSheetProps) {
                 onClose();
                 opt.onPress();
               }}>
-              <Icon
-                as={opt.icon}
-                size={20}
-                className={opt.destructive ? 'text-[#C0392B]' : 'text-[#111111]'}
-              />
+              <Iconify icon={opt.icon} size={20} color={opt.destructive ? '#C0392B' : '#111111'} />
               <Text className={opt.destructive ? 'text-base text-[#C0392B]' : 'text-base text-[#111111]'}>
                 {opt.label}
               </Text>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Pressable, TextInput, Alert, ScrollView } from 'react-native';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
 import { Text } from '@/components/ui/text';
-import { ChevronLeft, SearchIcon } from 'lucide-react-native';
+import { Iconify } from 'react-native-iconify';
 import { getDecks, createCard, Deck } from '@/lib/data/api';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -37,10 +37,10 @@ export default function SelectDeckScreen() {
         className="flex-row items-center gap-3 px-4"
         style={{ paddingTop: insets.top + 24 }}>
         <Pressable hitSlop={12} onPress={() => router.back()}>
-          <ChevronLeft size={24} color="#111111" strokeWidth={1.5} />
+          <Iconify icon="mynaui:chevron-left" size={24} color="#111111" />
         </Pressable>
         <View className="flex-1 flex-row items-center gap-2 rounded-full border-[1.5px] border-[#111111] px-4 py-2.5">
-          <SearchIcon size={16} color="#555" />
+          <Iconify icon="proicons:search" size={16} color="#555" />
           <TextInput
             value={query}
             onChangeText={setQuery}

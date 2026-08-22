@@ -5,18 +5,8 @@ import { getDecks, Deck, isOnboardingComplete } from '@/lib/data/api';
 import { importAnkiDeck } from '@/lib/data/ankiImport';
 import { cn } from '@/lib/utils';
 import { Stack, useFocusEffect, useRouter } from 'expo-router';
-import {
-  ArrowUpRightIcon,
-  ChevronDownIcon,
-  DownloadIcon,
-  HomeIcon,
-  PlusIcon,
-  SearchIcon,
-  SettingsIcon,
-  SparklesIcon,
-  XIcon,
-  LayersPlusIcon,
-} from 'lucide-react-native';
+import { Iconify } from 'react-native-iconify';
+import { WithAiIcon, ManuallyIcon, ImportIcon } from '@/components/create-deck-icons';
 import * as React from 'react';
 import { Alert, Animated, Dimensions, Modal, Pressable, ScrollView, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -65,7 +55,7 @@ function DeckCard({
       )}>
       <View className="flex-row items-center justify-between">
         <Text className="text-sm text-neutral-500">{deck.cards} cards</Text>
-        <ArrowUpRightIcon size={18} color="#111111" />
+        <Iconify icon="material-symbols-light:arrow-outward" size={18} color="#111111" />
       </View>
       <Text className="font-andada text-[30px] tracking-tighter text-[#111111]" numberOfLines={1}>
         {deck.title}
@@ -244,7 +234,7 @@ export default function HomeScreen() {
           {isSearching ? (
             <View className="flex-row items-center gap-3">
               <View className="flex-1 flex-row items-center gap-2 rounded-full bg-white/60 px-4 py-2.5">
-                <SearchIcon size={16} color="#555" />
+                <Iconify icon="proicons:search" size={16} color="#555" />
                 <TextInput
                   ref={searchInputRef}
                   value={searchQuery}
@@ -257,7 +247,7 @@ export default function HomeScreen() {
                 />
                 {searchQuery.length > 0 && (
                   <Pressable onPress={() => setSearchQuery('')}>
-                    <XIcon size={14} color="#888" />
+                    <Iconify icon="fluent:dismiss-20-filled" size={14} color="#888" />
                   </Pressable>
                 )}
               </View>
@@ -270,12 +260,12 @@ export default function HomeScreen() {
               <View className="flex-row items-center justify-between">
                 <Pressable className="flex-row items-center gap-1.5 rounded-full border-[1.5px] border-[#111111] px-4 py-2">
                   <Text className="text-sm font-medium text-[#111111]">Arabic</Text>
-                  <ChevronDownIcon size={14} color="#111111" />
+                  <Iconify icon="mynaui:chevron-down" size={14} color="#111111" />
                 </Pressable>
                 <Pressable
                   className="h-10 w-10 items-center justify-center rounded-full border-[1.5px] border-[#111111]"
                   onPress={openSearch}>
-                  <SearchIcon size={18} color="#111111" />
+                  <Iconify icon="proicons:search" size={18} color="#111111" />
                 </Pressable>
               </View>
               <View className='flex-col gap-10'>
@@ -285,7 +275,7 @@ export default function HomeScreen() {
                 <View className="w-full">
                   <Pressable onPress={() => router.push('/word-of-the-day')} className="flex-row items-end justify-between">
                   <Text className="text-sm leading-5 text-[#333333]">{'5 words\nper day'}</Text>
-                    <ArrowUpRightIcon size={20} color="#111111" />
+                    <Iconify icon="material-symbols-light:arrow-outward" size={20} color="#111111" />
                   </Pressable>
                 </View>
               </View>
@@ -377,17 +367,17 @@ export default function HomeScreen() {
         className="absolute left-12 right-12 items-center justify-center">
         <View className="w-2/3 flex-row items-center justify-around rounded-full bg-[#111111] px-4 py-4">
           <Pressable className="items-center justify-center active:opacity-70">
-            <HomeIcon size={22} color="#D7F005" strokeWidth={1.5} />
+            <Iconify icon="material-symbols-light:home-rounded" size={30} color="#D7F005" />
           </Pressable>
           <Pressable
             className="items-center justify-center active:opacity-70"
             onPress={() => setShowCreateSheet(true)}>
-            <PlusIcon size={22} color="white" strokeWidth={1.5} />
+            <Iconify icon="iconoir:plus" size={30} color="white" />
           </Pressable>
           <Pressable
             className="items-center justify-center active:opacity-70"
             onPress={() => Alert.alert('Settings', 'Coming soon')}>
-            <SettingsIcon size={22} color="white" strokeWidth={1.5} />
+            <Iconify icon="material-symbols-light:settings-outline-rounded" size={30} color="white" />
           </Pressable>
         </View>
       </Animated.View>
@@ -419,7 +409,7 @@ export default function HomeScreen() {
                   hitSlop={12}
                   className="h-8 w-8 items-center justify-center"
                   onPress={closeSheet}>
-                  <XIcon size={20} color="#111111" strokeWidth={1.5} />
+                  <Iconify icon="fluent:dismiss-20-filled" size={20} color="#111111" />
                 </Pressable>
                 <Text className="-ml-8 flex-1 text-center text-lg font-semibold text-[#111111]">
                   Create a deck
@@ -435,7 +425,7 @@ export default function HomeScreen() {
                     Alert.alert('With AI', 'Coming soon!');
                   }}>
                   <View className="h-20 w-20 items-center justify-center rounded-full bg-brand">
-                    <SparklesIcon size={30} color="#111111" strokeWidth={1.3} />
+                    <WithAiIcon size={26} color="#111111" />
                   </View>
                   <Text className="text-sm font-medium text-[#111111]">With AI</Text>
                 </Pressable>
@@ -447,14 +437,14 @@ export default function HomeScreen() {
                     router.push('/deck/create');
                   }}>
                   <View className="h-20 w-20 items-center justify-center rounded-full bg-brand">
-                    <LayersPlusIcon size={30} color="#111111" strokeWidth={1.3} />
+                    <ManuallyIcon size={26} color="#111111" />
                   </View>
                   <Text className="text-sm font-medium text-[#111111]">Manually</Text>
                 </Pressable>
 
                 <Pressable className="items-center gap-3 active:opacity-70" onPress={handleImport}>
                   <View className="h-20 w-20 items-center justify-center rounded-full bg-brand">
-                    <DownloadIcon size={30} color="#111111" strokeWidth={1.3} />
+                    <ImportIcon size={26} color="#111111" />
                   </View>
                   <Text className="text-sm font-medium text-[#111111]">Import</Text>
                 </Pressable>

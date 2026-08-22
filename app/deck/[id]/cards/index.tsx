@@ -2,7 +2,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import { Alert, Animated, PanResponder, Pressable, ScrollView, View } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { Text } from '@/components/ui/text';
-import { ChevronLeft, Plus, Pencil, Trash2 } from 'lucide-react-native';
+import { Iconify } from 'react-native-iconify';
 import { getCardsForDeck, deleteCard, Card as Flashcard } from '@/lib/data/api';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -51,7 +51,7 @@ function SwipeableCardRow({
           reset();
           onEdit();
         }}>
-        <Pencil size={20} color="#111111" strokeWidth={1.5} />
+        <Iconify icon="iconamoon:edit-thin" size={20} color="#111111" />
       </Pressable>
       {/* Delete action, revealed on the right */}
       <Pressable
@@ -60,7 +60,7 @@ function SwipeableCardRow({
           reset();
           onDelete();
         }}>
-        <Trash2 size={20} color="#111111" strokeWidth={1.5} />
+        <Iconify icon="si:bin-line" size={20} color="#111111" />
       </Pressable>
 
       <Animated.View
@@ -125,12 +125,12 @@ export default function CardListScreen() {
         <View className="gap-4 px-4">
           <View className="flex-row items-start justify-between">
             <Pressable hitSlop={12} onPress={() => router.back()}>
-              <ChevronLeft size={24} color="#111111" strokeWidth={1.5} />
+              <Iconify icon="mynaui:chevron-left" size={24} color="#111111" />
             </Pressable>
             <Pressable
               className="h-11 w-11 items-center justify-center rounded-full border-[1.5px] border-[#111111] bg-white"
               onPress={() => router.push(`/deck/${id}/cards/create`)}>
-              <Plus size={16} color="#111111" strokeWidth={1.5} />
+              <Iconify icon="si:add-duotone" size={16} color="#111111" />
             </Pressable>
           </View>
           <View className="flex-row items-end justify-between">
