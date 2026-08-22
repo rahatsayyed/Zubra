@@ -57,7 +57,7 @@ export default function SearchScreen() {
         <Pressable hitSlop={12} onPress={() => router.back()}>
           <Iconify icon="mynaui:chevron-left" size={24} color="#111111" />
         </Pressable>
-        <View className="flex-1 flex-row items-center gap-2 rounded-full border-[1.5px] border-[#111111] px-4 py-2.5">
+        <View className="flex-1 flex-row items-center gap-2 rounded-full border-[1.5px] border-[#111111] px-4 py-1.5">
           <Iconify icon="proicons:search" size={16} color="#555" />
           <TextInput
             ref={inputRef}
