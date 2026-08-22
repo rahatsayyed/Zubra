@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Alert, ScrollView } from 'react-native';
+import { View, TextInput, Alert, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import { getCard, updateCard, deleteCard } from '@/lib/data/api';
+import { X } from 'lucide-react-native';
+import { getCard, updateCard } from '@/lib/data/api';
 
 export default function EditCardScreen() {
-  const { id, cardId } = useLocalSearchParams<{ id: string, cardId: string }>();
+  const { cardId } = useLocalSearchParams<{ id: string; cardId: string }>();
   const router = useRouter();
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
@@ -30,10 +30,9 @@ export default function EditCardScreen() {
 
   const handleSave = async () => {
     if (!question.trim() || !answer.trim()) {
-      Alert.alert('Validation Error', 'Both question and answer are required');
+      Alert.alert('Missing fields', 'Fill in both the front and back of the card.');
       return;
     }
-    
     try {
       await updateCard(cardId, { question, answer });
       router.back();
@@ -42,68 +41,48 @@ export default function EditCardScreen() {
     }
   };
 
-  const handleDelete = () => {
-    Alert.alert('Delete Card', 'Are you sure you want to delete this card?', [
-      { text: 'Cancel', style: 'cancel' },
-      { 
-        text: 'Delete', 
-        style: 'destructive', 
-        onPress: async () => {
-          try {
-            await deleteCard(cardId);
-            router.back();
-          } catch (e: any) {
-            Alert.alert('Error', e.message);
-          }
-        } 
-      }
-    ]);
-  };
-
   if (loading) return null;
 
   return (
-    <>
-      <Stack.Screen options={{ title: 'Edit Card' }} />
-      <ScrollView className="flex-1 bg-background p-6" keyboardShouldPersistTaps="handled">
-        <View className="gap-6">
-          <View className="gap-2">
-            <Text className="text-sm font-medium text-foreground">Front (Question)</Text>
+    <View className="flex-1 justify-end bg-black/60">
+      <Stack.Screen options={{ headerShown: false, presentation: 'transparentModal' }} />
+      <Pressable className="flex-1" onPress={() => router.back()} />
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <View className="gap-8 rounded-t-3xl bg-white px-4 pb-10 pt-6">
+          <View className="flex-row items-center justify-center">
+            <Pressable
+              hitSlop={12}
+              className="absolute left-0 h-6 w-6 items-center justify-center"
+              onPress={() => router.back()}>
+              <X size={20} color="#111111" strokeWidth={1.5} />
+            </Pressable>
+            <Text className="text-lg text-[#111111]">Edit Card</Text>
+          </View>
+
+          <View className="gap-3">
             <TextInput
               value={question}
               onChangeText={setQuestion}
-              placeholder="e.g. What is the powerhouse of the cell?"
-              placeholderTextColor="#888"
-              className="rounded-lg border border-border bg-card p-4 text-base text-foreground"
-              multiline
-              numberOfLines={4}
-              textAlignVertical="top"
+              placeholder="Front (Question)"
+              placeholderTextColor="#7D7D7D"
+              className="rounded-full border-[1.5px] border-[#111111] px-6 py-4 text-base text-[#111111]"
             />
-          </View>
-          
-          <View className="gap-2">
-            <Text className="text-sm font-medium text-foreground">Back (Answer)</Text>
             <TextInput
               value={answer}
               onChangeText={setAnswer}
-              placeholder="e.g. Mitochondria"
-              placeholderTextColor="#888"
-              className="rounded-lg border border-border bg-card p-4 text-base text-foreground"
-              multiline
-              numberOfLines={4}
-              textAlignVertical="top"
+              placeholder="Back (Answer)"
+              placeholderTextColor="#7D7D7D"
+              className="rounded-full border-[1.5px] border-[#111111] px-6 py-4 text-base text-[#111111]"
             />
           </View>
-          
-          <Button onPress={handleSave} className="mt-4">
-            <Text>Save Changes</Text>
-          </Button>
 
-          <Button onPress={handleDelete} variant="destructive" className="mt-2 text-destructive-foreground">
-            <Text>Delete Card</Text>
-          </Button>
+          <Pressable
+            className="items-center rounded-full border-[1.5px] border-[#111111] bg-brand py-4 active:opacity-80"
+            onPress={handleSave}>
+            <Text className="text-base font-medium text-[#111111]">Save Changes</Text>
+          </Pressable>
         </View>
-      </ScrollView>
-    </>
+      </KeyboardAvoidingView>
+    </View>
   );
 }

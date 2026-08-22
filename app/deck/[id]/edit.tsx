@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Alert, ScrollView } from 'react-native';
+import { View, TextInput, Alert, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
+import { X } from 'lucide-react-native';
 import { getDeck, updateDeck, deleteDeck } from '@/lib/data/api';
 
 export default function EditDeckScreen() {
@@ -30,10 +30,9 @@ export default function EditDeckScreen() {
 
   const handleSave = async () => {
     if (!title.trim()) {
-      Alert.alert('Validation Error', 'Title is required');
+      Alert.alert('Missing title', 'Enter a name for the deck.');
       return;
     }
-    
     try {
       await updateDeck(id, { title, description });
       router.back();
@@ -43,64 +42,79 @@ export default function EditDeckScreen() {
   };
 
   const handleDelete = () => {
-    Alert.alert('Delete Deck', 'Are you sure you want to delete this deck? All cards and progress will be lost.', [
-      { text: 'Cancel', style: 'cancel' },
-      { 
-        text: 'Delete', 
-        style: 'destructive', 
-        onPress: async () => {
-          try {
-            await deleteDeck(id);
-            router.replace('/');
-          } catch (e: any) {
-            Alert.alert('Error', e.message);
-          }
-        } 
-      }
-    ]);
+    Alert.alert(
+      'Delete Deck',
+      'Are you sure you want to delete this deck? All cards and progress will be lost.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteDeck(id);
+              router.replace('/');
+            } catch (e: any) {
+              Alert.alert('Error', e.message);
+            }
+          },
+        },
+      ]
+    );
   };
 
   if (loading) return null;
 
   return (
-    <>
-      <Stack.Screen options={{ title: 'Edit Deck' }} />
-      <ScrollView className="flex-1 bg-background p-6" keyboardShouldPersistTaps="handled">
-        <View className="gap-6">
-          <View className="gap-2">
-            <Text className="text-sm font-medium text-foreground">Deck Title</Text>
+    <View className="flex-1 justify-end bg-black/60">
+      <Stack.Screen options={{ headerShown: false, presentation: 'transparentModal' }} />
+      <Pressable className="flex-1" onPress={() => router.back()} />
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <View className="gap-8 rounded-t-3xl bg-white px-4 pb-10 pt-6">
+          <View className="flex-row items-center justify-center">
+            <Pressable
+              hitSlop={12}
+              className="absolute left-0 h-6 w-6 items-center justify-center"
+              onPress={() => router.back()}>
+              <X size={20} color="#111111" strokeWidth={1.5} />
+            </Pressable>
+            <Text className="text-lg text-[#111111]">Edit deck</Text>
+          </View>
+
+          <View className="gap-6">
             <TextInput
               value={title}
               onChangeText={setTitle}
-              placeholder="e.g. Spanish Vocabulary"
-              placeholderTextColor="#888"
-              className="rounded-lg border border-border bg-card p-4 text-base text-foreground"
+              placeholder="Name of the deck"
+              placeholderTextColor="#CCB4D1"
+              className="text-[32px] font-bold leading-tight text-[#111111]"
             />
-          </View>
-          
-          <View className="gap-2">
-            <Text className="text-sm font-medium text-foreground">Description (Optional)</Text>
             <TextInput
               value={description}
               onChangeText={setDescription}
-              placeholder="A brief description of this deck"
-              placeholderTextColor="#888"
-              className="rounded-lg border border-border bg-card p-4 text-base text-foreground"
+              placeholder="Description (Optional)"
+              placeholderTextColor="#7D7D7D"
               multiline
               numberOfLines={4}
               textAlignVertical="top"
+              className="h-[100px] rounded-xl border-[1.5px] border-[#111111] px-4 py-3 text-base text-[#111111]"
             />
           </View>
-          
-          <Button onPress={handleSave} className="mt-4">
-            <Text>Save Changes</Text>
-          </Button>
-          
-          <Button onPress={handleDelete} variant="destructive" className="mt-2 text-destructive-foreground">
-            <Text>Delete Deck</Text>
-          </Button>
+
+          <View className="gap-3">
+            <Pressable
+              className="items-center rounded-full border-[1.5px] border-[#111111] bg-brand py-4 active:opacity-80"
+              onPress={handleSave}>
+              <Text className="text-base font-medium text-[#111111]">Save Changes</Text>
+            </Pressable>
+            <Pressable
+              className="items-center rounded-full border-[1.5px] border-[#111111] bg-error-bg py-4 active:opacity-80"
+              onPress={handleDelete}>
+              <Text className="text-base font-medium text-[#111111]">Delete Deck</Text>
+            </Pressable>
+          </View>
         </View>
-      </ScrollView>
-    </>
+      </KeyboardAvoidingView>
+    </View>
   );
 }

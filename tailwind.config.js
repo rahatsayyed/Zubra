@@ -21,6 +21,7 @@ module.exports = {
         'rating-hard': '#FFF8E7',
         'rating-good': '#E9FFE5',
         'rating-easy': '#E7F2FF',
+        'error-bg': '#E29191',
         // ── Design-system tokens ──────────────────────────
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
