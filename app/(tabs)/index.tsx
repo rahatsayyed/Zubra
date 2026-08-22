@@ -6,7 +6,6 @@ import { getDecks, Deck, isOnboardingComplete } from '@/lib/data/api';
 import { Stack, useFocusEffect, useRouter } from 'expo-router';
 import { Iconify } from 'react-native-iconify';
 import { useNavbarScroll } from '@/lib/navbar-context';
-import { useDecksRefreshSubscription } from '@/lib/decks-refresh-context';
 import * as React from 'react';
 import { Dimensions, Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -52,10 +51,6 @@ export default function HomeScreen() {
       loadData();
     }, [loadData])
   );
-
-  // Also reload when the shared Create Deck sheet (owned by the (tabs) layout)
-  // imports a deck, since that doesn't take focus away from Home.
-  useDecksRefreshSubscription(loadData);
 
   const featuredDeck = decks[0] ?? null;
 

@@ -6,12 +6,11 @@ import { useNavbarScroll } from '@/lib/navbar-context';
 
 interface NavbarProps {
   bottom: number;
-  onCreatePress: () => void;
 }
 
 // Floating pill nav, rendered once at the (tabs) layout level so it never
 // remounts when switching between Home and Settings.
-export function Navbar({ bottom, onCreatePress }: NavbarProps) {
+export function Navbar({ bottom }: NavbarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { navTranslateY } = useNavbarScroll();
@@ -33,7 +32,9 @@ export function Navbar({ bottom, onCreatePress }: NavbarProps) {
             color={isHome ? '#D7F005' : 'white'}
           />
         </Pressable>
-        <Pressable className="items-center justify-center active:opacity-70" onPress={onCreatePress}>
+        <Pressable
+          className="items-center justify-center active:opacity-70"
+          onPress={() => router.push('/create-deck')}>
           <Iconify icon="iconoir:plus" size={28} color="white" />
         </Pressable>
         <Pressable

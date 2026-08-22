@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, Modal, Pressable, TextInput } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { Text } from '@/components/ui/text';
-import { OptionSheet } from '@/components/option-sheet';
 import { Iconify } from 'react-native-iconify';
 import { getDeck, getDeckMastery, Deck, DifficultyBand } from '@/lib/data/api';
 import { getDeckColorClass } from '@/lib/utils';
@@ -19,7 +18,6 @@ export default function DeckDetailScreen() {
 
   const [deck, setDeck] = useState<Deck | null>(null);
   const [mastery, setMastery] = useState(0);
-  const [showMenu, setShowMenu] = useState(false);
   const [showCustomModal, setShowCustomModal] = useState(false);
 
   const [customLimit, setCustomLimit] = useState<number>(20);
@@ -64,7 +62,7 @@ export default function DeckDetailScreen() {
           </Pressable>
           <Pressable
             className="h-11 w-11 items-center justify-center rounded-full border-[1.5px] border-[#111111] bg-white/70"
-            onPress={() => setShowMenu(true)}>
+            onPress={() => router.push(`/deck/${id}/menu`)}>
             <Iconify icon="ant-design:more-outlined" size={16} color="#111111" />
           </Pressable>
         </View>
@@ -98,28 +96,6 @@ export default function DeckDetailScreen() {
           <Text className="text-base font-medium text-[#111111]">Custom Study</Text>
         </Pressable>
       </View>
-
-      <OptionSheet
-        visible={showMenu}
-        onClose={() => setShowMenu(false)}
-        options={[
-          {
-            label: 'Edit Deck',
-            icon: 'material-symbols-light:edit-outline',
-            onPress: () => router.push(`/deck/${id}/edit`),
-          },
-          {
-            label: 'Add Cards',
-            icon: 'si:add-duotone',
-            onPress: () => router.push(`/deck/${id}/cards/create`),
-          },
-          {
-            label: 'Manage Cards',
-            icon: 'material-symbols-light:dashboard-2-edit-outline',
-            onPress: () => router.push(`/deck/${id}/cards`),
-          },
-        ]}
-      />
 
       {/* Custom Study bottom sheet */}
       <Modal
