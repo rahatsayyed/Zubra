@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Alert, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, TextInput, Alert, Pressable, Animated } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { Text } from '@/components/ui/text';
 import { Iconify } from 'react-native-iconify';
 import { getDeck, updateDeck, deleteDeck } from '@/lib/data/api';
+import { useKeyboardOffset } from '@/lib/use-keyboard-offset';
 
 export default function EditDeckScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -11,6 +12,7 @@ export default function EditDeckScreen() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(true);
+  const keyboardOffset = useKeyboardOffset();
 
   useEffect(() => {
     const load = async () => {
@@ -74,11 +76,11 @@ export default function EditDeckScreen() {
         }}
       />
       {loading ? null : (
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1 justify-end">
+      <View className="flex-1 justify-end">
         <Pressable className="flex-1" onPress={() => router.back()} />
-        <View className="gap-8 rounded-t-3xl bg-white px-4 pb-10 pt-6">
+        <Animated.View
+          style={{ marginBottom: keyboardOffset }}
+          className="gap-8 rounded-t-3xl bg-white px-4 pb-10 pt-6">
           <View className="flex-row items-center justify-center">
             <Pressable
               hitSlop={12}
@@ -121,8 +123,8 @@ export default function EditDeckScreen() {
               <Text className="text-base font-medium text-[#111111]">Delete Deck</Text>
             </Pressable>
           </View>
-        </View>
-      </KeyboardAvoidingView>
+        </Animated.View>
+      </View>
       )}
     </View>
   );
